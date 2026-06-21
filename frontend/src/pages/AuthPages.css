@@ -1,0 +1,22 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-white);
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 28px;
+  color: var(--color-black);
+  text-align: center;
+  margin-bottom: 32px;
+}
