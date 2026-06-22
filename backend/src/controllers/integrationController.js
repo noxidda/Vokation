@@ -2,8 +2,11 @@ import Integration from '../models/Integration.js';
 import AuditLog from '../models/AuditLog.js';
 import { encrypt } from '../services/encryptionService.js';
 import { queueSyncJob, getRecentJobs, retryJob } from '../services/bullQueue.js';
-import { fetchShopifyData } from '../services/shopifyService.js';
 import crypto from 'crypto';
+import Organization from '../models/Organization.js';
+
+// Store OAuth states temporarily (in production, use Redis)
+const oauthStates = new Map();
 
 // Shopify OAuth
 export const initiateShopifyConnect = async (req, res) => {
@@ -21,11 +24,11 @@ export const initiateShopifyConnect = async (req, res) => {
     // Generate state for CSRF protection
     const state = crypto.randomBytes(16).toString('hex');
     
-    // Store state in session (for now, we'll use a simple in-memory store)
-    // In production, use Redis for this
-    req.session = req.session || {};
-    req.session.shopifyState = state;
-    req.session.organizationId = organizationId;
+    // Store state temporarily
+    oauthStates.set(state, {
+      organizationId,
+      timestamp: Date.now(),
+    });
 
     const redirectUri = process.env.SHOPIFY_REDIRECT_URI;
     const clientId = process.env.SHOPIFY_API_KEY;
@@ -48,12 +51,16 @@ export const shopifyCallback = async (req, res) => {
     const { code, shop, state, hmac } = req.query;
 
     // Verify state
-    if (state !== req.session?.shopifyState) {
+    const stateData = oauthStates.get(state);
+    if (!stateData) {
       return res.status(400).json({
         error: true,
-        message: 'Invalid state parameter',
+        message: 'Invalid or expired state parameter',
       });
     }
+
+    // Remove used state
+    oauthStates.delete(state);
 
     // Verify HMAC
     const queryString = Object.keys(req.query)
@@ -101,7 +108,7 @@ export const shopifyCallback = async (req, res) => {
 
     // Save integration
     const integration = await Integration.create({
-      organizationId: req.session.organizationId,
+      organizationId: stateData.organizationId,
       platform: 'shopify',
       accessToken: encryptedToken,
       refreshToken: tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null,
@@ -111,17 +118,19 @@ export const shopifyCallback = async (req, res) => {
 
     // Create audit log
     await AuditLog.create({
-      organizationId: req.session.organizationId,
-      userId: req.userId,
+      organizationId: stateData.organizationId,
+      userId: req.userId || 'system',
       action: 'connected_integration',
       metadata: { platform: 'shopify', storeId: shop },
     });
 
     // Redirect back to frontend
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/integrations?success=shopify`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/integrations?success=shopify`);
   } catch (error) {
     console.error('Shopify callback error:', error);
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/integrations?error=shopify`);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/integrations?error=shopify`);
   }
 };
 
@@ -259,6 +268,39 @@ export const retryFailedJob = async (req, res) => {
     res.status(500).json({
       error: true,
       message: 'Failed to retry job',
+    });
+  }
+};
+
+export const connectIntegration = async (req, res) => {
+  try {
+    const { platform } = req.params;
+    const { organizationId } = req;
+    
+    // Check if organization is on Free tier
+    const organization = await Organization.findById(organizationId);
+    
+    if (organization.subscriptionTier === 'free') {
+      // Count existing integrations
+      const integrationCount = await Integration.countDocuments({
+        organizationId,
+        isActive: true,
+      });
+      
+      if (integrationCount >= 1) {
+        return res.status(403).json({
+          error: true,
+          message: 'Free plan allows only 1 platform connection. Upgrade to Pro for unlimited connections.',
+        });
+      }
+    }
+    
+    // Continue with connection logic...
+  } catch (error) {
+    console.error('Connect integration error:', error);
+    res.status(500).json({
+      error: true,
+      message: 'Failed to connect integration',
     });
   }
 };

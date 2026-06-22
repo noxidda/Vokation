@@ -2,13 +2,14 @@
 .layout {
   display: flex;
   min-height: 100vh;
+  background-color: var(--color-bg-deep);
 }
 
 .layout__main {
   flex: 1;
   margin-left: 240px;
-  padding: 32px;
-  background: var(--color-white);
+  padding: 40px;
+  background: transparent;
 }
 
 .layout__content {
@@ -20,13 +21,13 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 24px;
 }
 
 /* Grid */
 .grid {
   display: grid;
-  gap: 20px;
+  gap: 24px;
 }
 
 .grid--2 {
@@ -38,7 +39,7 @@
 }
 
 .grid--4 {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 /* Utilities */
@@ -71,10 +72,10 @@
 .mb-9 { margin-bottom: 48px; }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .layout__main {
     margin-left: 0;
-    padding: 16px;
+    padding: 24px 16px;
   }
   
   .grid--2,

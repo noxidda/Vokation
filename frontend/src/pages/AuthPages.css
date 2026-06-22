@@ -3,20 +3,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-white);
-  padding: 20px;
+  background: var(--color-bg-deep);
+  padding: 24px;
 }
 
 .auth-container {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 40px 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.1);
 }
 
 .auth-title {
   font-family: var(--font-family);
-  font-weight: 600;
-  font-size: 28px;
-  color: var(--color-black);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--color-white);
   text-align: center;
   margin-bottom: 32px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }

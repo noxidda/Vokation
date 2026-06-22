@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import AuditLog from '../models/AuditLog.js';
 import clerk from '../config/clerk.js';
+import Organization from '../models/Organization.js';
 
 export const getTeamMembers = async (req, res) => {
   try {
@@ -31,6 +32,19 @@ export const inviteMember = async (req, res) => {
         error: true,
         message: 'Only admins can invite members',
       });
+    }
+
+    // Check if organization is on Free tier
+    const organization = await Organization.findById(organizationId);
+    if (organization && organization.subscriptionTier === 'free') {
+      // Count existing members
+      const memberCount = await User.countDocuments({ organizationId });
+      if (memberCount >= 2) {
+        return res.status(403).json({
+          error: true,
+          message: 'Free plan allows only 2 team members. Upgrade to Pro for unlimited members.',
+        });
+      }
     }
 
     // Validate email
@@ -64,7 +78,7 @@ export const inviteMember = async (req, res) => {
 
     // In a real implementation, you would send an invitation via Clerk
     // For now, we'll just log it
-    console.log(`📧 Inviting ${email} as ${role}`);
+    console.log(`[Team] Inviting ${email} as ${role}`);
 
     // Create audit log
     await AuditLog.create({

@@ -6,7 +6,7 @@ dotenv.config();
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 if (!ENCRYPTION_KEY) {
-  console.error('❌ ENCRYPTION_KEY is not set in environment variables');
+  console.error('[Encryption] ENCRYPTION_KEY is not set in environment variables');
   process.exit(1);
 }
 

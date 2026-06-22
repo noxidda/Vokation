@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "vokation-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -7,7 +7,7 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@clerk/clerk-sdk-node": "^4.13.9",
+    "@clerk/clerk-sdk-node": "^5.1.6",
     "bullmq": "^5.15.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
@@ -17,6 +17,7 @@
     "ioredis": "^5.3.2",
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
+    "razorpay": "^2.9.6",
     "socket.io": "^4.7.2"
   },
   "devDependencies": {

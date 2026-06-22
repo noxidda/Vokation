@@ -9,6 +9,10 @@ const organizationSchema = new mongoose.Schema({
     type: String,
     index: true,
   },
+  razorpaySubscriptionId: {
+    type: String,
+    sparse: true,
+  },
   subscriptionTier: {
     type: String,
     enum: ['free', 'pro'],
@@ -16,8 +20,11 @@ const organizationSchema = new mongoose.Schema({
   },
   subscriptionStatus: {
     type: String,
-    enum: ['active', 'inactive', 'past_due', 'canceled'],
+    enum: ['active', 'inactive', 'past_due', 'canceled', 'expired'],
     default: 'inactive',
+  },
+  subscriptionExpiry: {
+    type: Date,
   },
   createdAt: {
     type: Date,

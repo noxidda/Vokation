@@ -1,6 +1,9 @@
 import { Queue } from 'bullmq';
 import redis from '../config/redis.js';
 import BackgroundJob from '../models/BackgroundJob.js';
+import Notification from '../models/Notification.js';
+import { fetchShopifyData } from './shopifyService.js';
+import { getIO } from '../config/socket.js';
 
 export const JOB_TYPES = {
   SYNC_SHOPIFY: 'sync-shopify',
@@ -37,8 +40,118 @@ export const queueSyncJob = async (organizationId, platform, integrationId) => {
       jobId: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       organizationId,
       platform,
-      status: 'queued',
+      status: 'pending',
     });
+
+    // Check if Redis is connected
+    if (redis.status !== 'ready') {
+      console.log(`[Queue] Redis is not ready (status: ${redis.status}). Processing job in-process.`);
+      
+      // Execute in next tick to not block HTTP response
+      setImmediate(async () => {
+        try {
+          // Update status to processing
+          backgroundJob.status = 'processing';
+          await backgroundJob.save();
+
+          // Emit sync:started
+          const io = getIO();
+          if (io) {
+            io.to(`org:${organizationId}`).emit('sync:started', {
+              platform,
+              jobId: backgroundJob.jobId,
+              timestamp: new Date(),
+            });
+          }
+
+          // Create notification
+          await Notification.create({
+            organizationId,
+            type: 'sync_started',
+            title: `${platform} sync started`,
+            message: `Sync job ${backgroundJob.jobId} is processing`,
+            metadata: { platform, jobId: backgroundJob.jobId },
+          });
+
+          // Run the sync
+          let result;
+          if (platform === 'shopify') {
+            result = await fetchShopifyData(integrationId);
+          } else {
+            throw new Error(`${platform} sync not implemented yet`);
+          }
+
+          // Update status to completed
+          backgroundJob.status = 'completed';
+          backgroundJob.result = result;
+          backgroundJob.completedAt = new Date();
+          await backgroundJob.save();
+
+          // Create notification for success
+          const revenueFormatted = (result.revenue || 0).toLocaleString('en-IN');
+          await Notification.create({
+            organizationId,
+            type: 'sync_success',
+            title: `${platform} sync completed`,
+            message: `₹${revenueFormatted} revenue, ${result.orders || 0} orders synced`,
+            metadata: { 
+              platform, 
+              jobId: backgroundJob.jobId, 
+              summary: result,
+            },
+          });
+
+          // Emit sync:completed
+          if (io) {
+            io.to(`org:${organizationId}`).emit('sync:completed', {
+              platform,
+              jobId: backgroundJob.jobId,
+              summary: {
+                revenue: result.revenue || 0,
+                orders: result.orders || 0,
+                products: result.products || 0,
+              },
+              timestamp: new Date(),
+            });
+          }
+        } catch (jobErr) {
+          console.error(`[Queue] In-process job ${backgroundJob.jobId} failed:`, jobErr.message);
+          backgroundJob.status = 'failed';
+          backgroundJob.error = jobErr.message;
+          backgroundJob.completedAt = new Date();
+          await backgroundJob.save();
+
+          // Create notification for failure
+          await Notification.create({
+            organizationId,
+            type: 'sync_failed',
+            title: `${platform} sync failed`,
+            message: jobErr.message,
+            metadata: { 
+              platform, 
+              jobId: backgroundJob.jobId, 
+              error: jobErr.message,
+            },
+          });
+
+          // Emit sync:failed
+          if (io) {
+            io.to(`org:${organizationId}`).emit('sync:failed', {
+              platform,
+              jobId: backgroundJob.jobId,
+              error: jobErr.message,
+              timestamp: new Date(),
+            });
+          }
+        }
+      });
+
+      return {
+        jobId: backgroundJob.jobId,
+        backgroundJobId: backgroundJob._id,
+        status: 'pending',
+      };
+    }
 
     // Add job to BullMQ queue
     const job = await syncQueue.add(jobType, {
@@ -50,12 +163,13 @@ export const queueSyncJob = async (organizationId, platform, integrationId) => {
 
     // Update BackgroundJob with BullMQ job ID
     backgroundJob.jobId = job.id;
+    backgroundJob.status = 'pending';
     await backgroundJob.save();
 
     return {
       jobId: job.id,
       backgroundJobId: backgroundJob._id,
-      status: 'queued',
+      status: 'pending',
     };
   } catch (error) {
     console.error('Queue sync job error:', error);

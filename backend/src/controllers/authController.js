@@ -40,7 +40,7 @@ export const clerkWebhook = async (req, res) => {
         role: 'admin', // First user is admin
       });
 
-      console.log(`✅ User created: ${email} (${id})`);
+      console.log(`[Webhook] User created: ${email} (${id})`);
       return res.status(201).json({
         message: 'User and organization created successfully',
       });

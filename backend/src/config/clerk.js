@@ -1,9 +1,9 @@
-import { Clerk } from '@clerk/clerk-sdk-node';
+import { createClerkClient } from '@clerk/clerk-sdk-node';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const clerk = new Clerk({
+const clerk = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
 

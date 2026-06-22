@@ -1,9 +1,9 @@
-import User from '../models/User.js';
+import { getOrCreateUser } from '../utils/userProvisioner.js';
 
 export const organizationAccess = async (req, res, next) => {
   try {
-    // Find user in MongoDB by Clerk userId
-    const user = await User.findOne({ clerkUserId: req.userId });
+    // Find user in MongoDB by Clerk userId or auto-provision them
+    const user = await getOrCreateUser(req.userId);
     
     if (!user) {
       return res.status(403).json({

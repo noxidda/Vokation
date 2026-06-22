@@ -21,44 +21,61 @@ const SignUpPage = () => {
         <h1 className="auth-title">MergeMetrics</h1>
         <SignUp 
           appearance={{
+            variables: {
+              colorPrimary: '#8b5cf6',
+              colorText: '#e2d9f3',
+              colorTextSecondary: '#a197b4',
+              colorBackground: '#0c0816',
+              colorInputBackground: '#140e24',
+              colorInputText: '#ffffff',
+              colorBorder: 'rgba(139, 92, 246, 0.2)',
+              fontFamily: 'Raleway, Inter, sans-serif',
+            },
             elements: {
               rootBox: {
                 width: '100%',
               },
               card: {
-                borderRadius: '0',
+                backgroundColor: 'transparent',
                 boxShadow: 'none',
-                border: '1px solid #e0e0e0',
+                border: 'none',
+                width: '100%',
+                padding: '0',
               },
               headerTitle: {
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '600',
+                color: '#ffffff',
+                fontWeight: '700',
               },
               headerSubtitle: {
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '400',
-              },
-              formButtonPrimary: {
-                backgroundColor: '#800000',
-                borderRadius: '0',
-                fontFamily: 'Inter, sans-serif',
-                fontWeight: '500',
-              },
-              formButtonPrimary__hover: {
-                backgroundColor: '#6B1D1D',
-              },
-              formFieldInput: {
-                borderRadius: '0',
-                fontFamily: 'Inter, sans-serif',
+                color: '#a197b4',
               },
               socialButtonsBlockButton: {
-                borderRadius: '0',
-                fontFamily: 'Inter, sans-serif',
+                backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                borderColor: 'rgba(139, 92, 246, 0.15)',
+                color: '#ffffff',
+                borderRadius: '6px',
+                transition: 'background-color 0.25s ease, border-color 0.25s ease',
               },
-              footer: {
-                fontFamily: 'Inter, sans-serif',
+              formFieldLabel: {
+                color: '#e2d9f3',
               },
-            },
+              formFieldInput: {
+                backgroundColor: '#140e24',
+                borderColor: 'rgba(139, 92, 246, 0.2)',
+                color: '#ffffff',
+                borderRadius: '6px',
+              },
+              formButtonPrimary: {
+                background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                color: '#ffffff',
+                borderRadius: '6px',
+                border: 'none',
+                fontWeight: '600',
+              },
+              footerActionLink: {
+                color: '#8b5cf6',
+              }
+            }
           }}
         />
       </div>

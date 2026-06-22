@@ -1,23 +1,18 @@
 import { Server } from 'socket.io';
-import { Clerk } from '@clerk/clerk-sdk-node';
-import User from '../models/User.js';
+import clerk from './clerk.js';
+import { getOrCreateUser } from '../utils/userProvisioner.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
-
-const clerk = new Clerk({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
 
 let ioInstance = null;
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: process.env.NODE_ENV === 'production' 
-        ? process.env.FRONTEND_URL 
-        : 'http://localhost:5173',
+      origin: process.env.FRONTEND_URL || 'http://localhost:5173',
       methods: ['GET', 'POST'],
+      credentials: true,
     },
   });
 
@@ -31,16 +26,14 @@ export const setupSocket = (server) => {
       }
 
       // Verify token with Clerk
-      const session = await clerk.sessions.verifySession({
-        sessionId: token,
-      });
+      const claims = await clerk.verifyToken(token);
 
-      if (!session) {
+      if (!claims) {
         return next(new Error('Invalid token'));
       }
 
-      // Find user in MongoDB
-      const user = await User.findOne({ clerkUserId: session.userId });
+      // Find user in MongoDB or auto-provision them
+      const user = await getOrCreateUser(claims.sub);
       
       if (!user || !user.organizationId) {
         return next(new Error('User not found or no organization'));
@@ -48,7 +41,7 @@ export const setupSocket = (server) => {
 
       socket.data.userId = user._id;
       socket.data.organizationId = user.organizationId;
-      socket.data.clerkUserId = session.userId;
+      socket.data.clerkUserId = claims.sub;
       
       next();
     } catch (error) {
@@ -64,13 +57,13 @@ export const setupSocket = (server) => {
     const room = `org:${organizationId}`;
     socket.join(room);
     
-    console.log(`🔌 User ${userId} connected to room ${room}`);
+    console.log(`[Socket] User ${userId} connected to room ${room}`);
 
     // Send connection confirmation
-    socket.emit('connected', { message: 'Connected to notification server' });
+    socket.emit('connected', { message: 'Connected to Vokation notification server' });
 
     socket.on('disconnect', () => {
-      console.log(`🔌 User ${userId} disconnected`);
+      console.log(`[Socket] User ${userId} disconnected`);
     });
   });
 

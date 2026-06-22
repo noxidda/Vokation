@@ -12,6 +12,9 @@ import Integrations from './pages/Integrations';
 import Team from './pages/Team';
 import Settings from './pages/Settings';
 import AuditLog from './pages/AuditLog';
+import BackgroundJobs from './pages/BackgroundJobs';
+import Pricing from './pages/Pricing';
+import { SocketProvider } from './context/SocketContext';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -20,20 +23,24 @@ function App() {
     <ClerkProvider publishableKey={clerkPubKey}>
       <Provider store={store}>
         <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route element={<ProtectedRoute />}>
-              <Route element={<Layout />}>
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/integrations" element={<Integrations />} />
-                <Route path="/team" element={<Team />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/audit-log" element={<AuditLog />} />
+          <SocketProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route element={<ProtectedRoute />}>
+                <Route element={<Layout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/integrations" element={<Integrations />} />
+                  <Route path="/team" element={<Team />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/audit-log" element={<AuditLog />} />
+                  <Route path="/jobs" element={<BackgroundJobs />} />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
+            </Routes>
+          </SocketProvider>
         </BrowserRouter>
       </Provider>
     </ClerkProvider>

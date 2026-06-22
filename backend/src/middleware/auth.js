@@ -14,18 +14,16 @@ export const authMiddleware = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     
     // Verify token with Clerk
-    const session = await clerk.sessions.verifySession({
-      sessionId: token,
-    });
+    const claims = await clerk.verifyToken(token);
 
-    if (!session) {
+    if (!claims) {
       return res.status(401).json({
         error: true,
         message: 'Invalid token',
       });
     }
 
-    req.userId = session.userId;
+    req.userId = claims.sub;
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);

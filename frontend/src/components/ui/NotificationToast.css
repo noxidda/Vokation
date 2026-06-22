@@ -1,0 +1,62 @@
+.toast {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--color-bg-panel-solid);
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 10px rgba(139, 92, 246, 0.08);
+  margin-bottom: 12px;
+}
+
+.toast--success {
+  border-left-color: var(--color-purple);
+}
+
+.toast--error {
+  border-left-color: var(--color-pink);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(236, 72, 153, 0.1);
+}
+
+.toast--info {
+  border-left-color: var(--color-lavender-dark);
+}
+
+.toast__content {
+  flex: 1;
+}
+
+.toast__title {
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-white);
+  margin-bottom: 4px;
+}
+
+.toast__message {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--color-lavender-dark);
+}
+
+.toast__close {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: var(--color-lavender-dark);
+  cursor: pointer;
+  padding: 4px;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-speed) ease;
+}
+
+.toast__close:hover {
+  color: var(--color-pink);
+}

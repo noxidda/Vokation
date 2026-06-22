@@ -1,0 +1,199 @@
+.jobs {
+  padding: 0;
+}
+
+.jobs__title {
+  font-family: var(--font-family);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--color-white);
+  margin-bottom: 8px;
+}
+
+.jobs__subtitle {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-lavender-dark);
+  margin-bottom: 32px;
+}
+
+.jobs__filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.jobs__filter-btn {
+  padding: 8px 18px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-lavender);
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.jobs__filter-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+}
+
+.jobs__filter-btn--active {
+  background: var(--color-purple);
+  color: var(--color-white);
+  border-color: var(--color-purple);
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.25);
+}
+
+.jobs__filter-btn--active:hover {
+  background: var(--color-purple-dark);
+}
+
+.jobs__table-container {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background: var(--color-bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.jobs__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-family);
+}
+
+.jobs__table th {
+  padding: 16px 20px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-lavender-dark);
+  background: rgba(13, 9, 23, 0.4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.jobs__table td {
+  padding: 16px 20px;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.jobs__table tr:last-child td {
+  border-bottom: none;
+}
+
+.jobs__table tr:hover td {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.jobs__platform {
+  text-transform: capitalize;
+}
+
+.jobs__loading,
+.jobs__empty {
+  text-align: center;
+  padding: 48px !important;
+  color: var(--color-lavender-dark);
+}
+
+.jobs__error {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--color-pink);
+  font-family: var(--font-family);
+}
+
+.jobs__retry {
+  margin-top: 16px;
+  padding: 8px 24px;
+  background: var(--color-pink);
+  color: var(--color-white);
+  border: none;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
+  transition: filter var(--transition-speed) ease;
+}
+
+.jobs__retry:hover {
+  filter: brightness(1.1);
+}
+
+.jobs__retry-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-purple);
+  background: transparent;
+  color: var(--color-purple);
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.jobs__retry-btn:hover {
+  background: var(--color-purple);
+  color: var(--color-white);
+}
+
+.jobs__processing {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--color-lavender-dark);
+}
+
+.jobs__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.jobs__page-btn {
+  padding: 8px 16px;
+  font-family: var(--font-family);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-lavender);
+  border-radius: var(--border-radius);
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.jobs__page-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-white);
+  border-color: var(--color-border-hover);
+}
+
+.jobs__page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.jobs__page-info {
+  font-family: var(--font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-lavender-dark);
+}

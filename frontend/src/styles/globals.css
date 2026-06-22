@@ -1,6 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap');
 
-/* CSS Reset */
 *,
 *::before,
 *::after {
@@ -12,68 +11,90 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #040209;
+}
+
+:root {
+  --color-bg-deep: #040209;
+  --color-bg-panel: rgba(13, 9, 23, 0.6);
+  --color-bg-panel-solid: #0c0816;
+  --color-bg-card: rgba(20, 14, 34, 0.35);
+  --color-border: rgba(139, 92, 246, 0.15);
+  --color-border-hover: rgba(236, 72, 153, 0.35);
+  --color-border-glow: rgba(139, 92, 246, 0.3);
+  
+  --color-lavender: #e2d9f3;
+  --color-lavender-dark: #a197b4;
+  --color-purple: #8b5cf6;
+  --color-purple-dark: #6d28d9;
+  --color-pink: #ec4899;
+  --color-pink-dark: #be185d;
+  --color-violet: #4c1d95;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  
+  --font-family: 'Raleway', 'Inter', -apple-system, sans-serif;
+  --border-radius: 8px;
+  --transition-speed: 0.25s;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: var(--font-family);
   font-size: 16px;
-  line-height: 1.5;
-  color: #000000;
-  background-color: #ffffff;
+  line-height: 1.6;
+  color: var(--color-lavender);
+  background-color: var(--color-bg-deep);
+  min-height: 100vh;
 }
 
-/* CSS Variables */
-:root {
-  --color-maroon: #800000;
-  --color-maroon-dark: #6B1D1D;
-  --color-yellow: #F5A623;
-  --color-yellow-dark: #E8A800;
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-grey-900: #1a1a1a;
-  --color-grey-700: #4a4a4a;
-  --color-grey-500: #666666;
-  --color-grey-300: #d4d4d4;
-  --color-grey-200: #e0e0e0;
-  --color-grey-100: #f5f5f5;
-  --color-grey-50: #fafafa;
-  
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  --border-radius: 0;
-  --transition-duration: 0s;
-}
-
-/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family);
   font-weight: 600;
-  color: var(--color-black);
+  color: var(--color-white);
+  letter-spacing: -0.01em;
 }
 
 a {
-  color: var(--color-maroon);
+  color: var(--color-purple);
   text-decoration: none;
+  transition: color var(--transition-speed) ease, text-shadow var(--transition-speed) ease;
 }
 
 a:hover {
-  color: var(--color-maroon-dark);
+  color: var(--color-pink);
+  text-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-grey-100);
+  background: var(--color-bg-deep);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-grey-300);
-  border-radius: 0;
+  background: var(--color-border);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-grey-500);
+  background: var(--color-purple);
+}
+
+/* Glassmorphism panel base */
+.panel-glass {
+  background: var(--color-bg-panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.panel-glass:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.08);
 }

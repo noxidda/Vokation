@@ -1,4 +1,5 @@
 import Integration from '../models/Integration.js';
+import BackgroundJob from '../models/BackgroundJob.js';
 
 export const getDashboardMetrics = async (req, res) => {
   try {
@@ -16,6 +17,12 @@ export const getDashboardMetrics = async (req, res) => {
     let conversionRate = 0;
     let lastSynced = null;
     const platforms = [];
+
+    // Check for any pending sync jobs
+    const pendingJobs = await BackgroundJob.countDocuments({
+      organizationId,
+      status: { $in: ['queued', 'processing'] },
+    });
 
     // Process each integration
     for (const integration of integrations) {
@@ -60,24 +67,29 @@ export const getDashboardMetrics = async (req, res) => {
 
     // Get revenue trend from Shopify (if connected)
     let revenueTrend = [];
+    let ordersTrend = [];
+    let conversionTrend = [];
+    
     const shopifyIntegration = integrations.find(i => i.platform === 'shopify');
     
     if (shopifyIntegration?.cachedData?.metrics?.last30Days) {
-      revenueTrend = shopifyIntegration.cachedData.metrics.last30Days;
+      revenueTrend = shopifyIntegration.cachedData.metrics.last30Days.map(day => ({
+        date: day.date,
+        revenue: day.revenue || 0,
+      }));
+      
+      ordersTrend = shopifyIntegration.cachedData.metrics.last30Days.map(day => ({
+        date: day.date,
+        orders: day.orders || 0,
+      }));
+      
+      // Conversion trend (placeholder until Google Analytics)
+      conversionTrend = shopifyIntegration.cachedData.metrics.last30Days.map(day => ({
+        date: day.date,
+        rate: 0,
+        visitors: 0,
+      }));
     }
-
-    // Get orders trend
-    let ordersTrend = revenueTrend.map(day => ({
-      date: day.date,
-      orders: day.orders || 0,
-    }));
-
-    // Get conversion trend (placeholder until Google Analytics is integrated)
-    let conversionTrend = revenueTrend.map(day => ({
-      date: day.date,
-      rate: 0,
-      visitors: 0,
-    }));
 
     res.status(200).json({
       totalRevenue,
@@ -90,6 +102,7 @@ export const getDashboardMetrics = async (req, res) => {
       ordersTrend,
       conversionTrend,
       hasIntegrations: integrations.length > 0,
+      hasPendingJobs: pendingJobs > 0,
     });
   } catch (error) {
     console.error('Dashboard metrics error:', error);

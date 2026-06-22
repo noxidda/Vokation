@@ -18,7 +18,10 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+}));
 app.use(express.json());
 app.use(morgan('dev'));
 
@@ -38,7 +41,7 @@ const io = setupSocket(server);
 initializeWorker(io);
 
 server.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`🔌 Socket.io enabled`);
-  console.log(`⚡ BullMQ worker initialized`);
+  console.log(`[Server] Vokation Server running on http://localhost:${PORT}`);
+  console.log(`[Server] Socket.io enabled`);
+  console.log(`[Server] BullMQ worker initialized`);
 });

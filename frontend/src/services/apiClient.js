@@ -1,35 +1,18 @@
 import { fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { useAuth } from '../hooks/useAuth';
-
-// This is the base query that will be used by RTK Query
-export const baseQuery = fetchBaseQuery({
-  baseUrl: import.meta.env.VITE_API_URL || '/api',
-  prepareHeaders: async (headers) => {
-    try {
-      // We need to get the token from Clerk
-      // This is a bit tricky in RTK Query, we'll handle it in the interceptor
-      return headers;
-    } catch (error) {
-      console.error('Error preparing headers:', error);
-      return headers;
-    }
-  },
-});
-
-// For axios interceptor approach (alternative)
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Create axios instance for regular API calls
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
-  timeout: 10000,
+  baseURL: API_URL,
+  timeout: 30000,
 });
 
 // Request interceptor to add auth token
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      // We'll get the token from Clerk via a hook
-      // This needs to be handled differently in RTK Query
       const token = localStorage.getItem('clerk-token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -49,30 +32,14 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Redirect to login
       window.location.href = '/login';
-    }
-    if (error.response?.status === 500) {
-      // Show toast or error message
-      console.error('Server error:', error.response.data);
     }
     return Promise.reject(error);
   }
 );
 
-// RTK Query wrapper that uses Clerk for auth
-export const getAuthHeaders = async () => {
-  try {
-    // This will be implemented with Clerk's getToken
-    return {};
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    return {};
-  }
-};
-
-// Custom fetch base query with Clerk auth
-export const customBaseQuery = async ({ url, method, body, params }, api) => {
+// RTK Query base query with auth
+export const customBaseQuery = async (args, api) => {
   try {
     const token = localStorage.getItem('clerk-token');
     const headers = {
@@ -83,8 +50,17 @@ export const customBaseQuery = async ({ url, method, body, params }, api) => {
       headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL || '/api'}${url}`, {
-      method: method || 'GET',
+    const url = typeof args === 'string' ? args : args.url;
+    const method = typeof args === 'string' ? 'GET' : args.method || 'GET';
+    const body = typeof args === 'string' ? undefined : args.body;
+    const params = typeof args === 'string' ? undefined : args.params;
+
+    const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+    const queryParams = params ? new URLSearchParams(params).toString() : '';
+    const fullUrl = `${API_URL}${normalizedUrl}${queryParams ? `?${queryParams}` : ''}`;
+
+    const response = await fetch(fullUrl, {
+      method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
     });
