@@ -1,18 +1,15 @@
 .empty-state {
   padding: 64px 32px;
   text-align: center;
-  background: var(--color-bg-card);
+  background: var(--color-black);
   border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .empty-state__title {
   font-family: var(--font-family);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 20px;
-  color: var(--color-white);
+  color: var(--color-lavender);
   margin-bottom: 12px;
 }
 
@@ -29,19 +26,16 @@
 
 .empty-state__action {
   padding: 10px 24px;
-  background: linear-gradient(135deg, var(--color-purple), var(--color-pink));
-  color: var(--color-white);
-  border: none;
+  background: var(--color-pink);
+  color: var(--color-black);
+  border: 1px solid var(--color-pink);
   font-family: var(--font-family);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
-  transition: filter var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .empty-state__action:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.35);
+  background: var(--color-black);
+  color: var(--color-pink);
 }

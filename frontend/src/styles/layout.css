@@ -1,20 +1,25 @@
 /* Layout */
 .layout {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   background-color: var(--color-bg-deep);
 }
 
 .layout__main {
   flex: 1;
-  margin-left: 240px;
-  padding: 40px;
+  margin-left: 0;
+  padding: 40px 24px;
   background: transparent;
+  display: flex;
+  flex-direction: column;
 }
 
 .layout__content {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  flex-grow: 1;
 }
 
 /* Container */

@@ -20,17 +20,17 @@ export const createOrder = async (req, res) => {
       });
     }
     
-    // Only Pro is available for purchase
-    if (plan !== 'pro') {
+    // Allow both pro and pro_annual plans
+    if (plan !== 'pro' && plan !== 'pro_annual') {
       return res.status(400).json({
         error: true,
         message: 'Invalid plan selected',
       });
     }
     
-    // Create Razorpay order
-    const amount = 99900; // ₹999 in paise
-    const receipt = `rcpt_${organizationId}_${Date.now()}`;
+    // Calculate Razorpay order amount (₹999 or ₹6999 in paise)
+    const amount = plan === 'pro_annual' ? 699900 : 99900;
+    const receipt = `rcpt_${organizationId.toString().slice(-8)}_${Date.now()}`;
     
     const order = await razorpay.orders.create({
       amount,
@@ -38,7 +38,7 @@ export const createOrder = async (req, res) => {
       receipt,
       notes: {
         organizationId: organizationId.toString(),
-        plan: 'pro',
+        plan,
         userId: user._id.toString(),
         email: user.email,
       },
@@ -52,7 +52,7 @@ export const createOrder = async (req, res) => {
       razorpayOrderId: order.id,
       amount,
       currency: 'INR',
-      plan: 'pro',
+      plan,
       status: 'created',
     });
     
@@ -123,9 +123,13 @@ export const verifyPayment = async (req, res) => {
     organization.subscriptionTier = 'pro';
     organization.subscriptionStatus = 'active';
     
-    // Set expiry (30 days from now)
+    // Set expiry based on plan tier (annual vs monthly)
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30);
+    if (payment.plan === 'pro_annual') {
+      expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 year
+    } else {
+      expiryDate.setDate(expiryDate.getDate() + 30); // 30 days
+    }
     organization.subscriptionExpiry = expiryDate;
     await organization.save();
     

@@ -5,6 +5,7 @@ import BackgroundJob from '../models/BackgroundJob.js';
 import Integration from '../models/Integration.js';
 import Notification from '../models/Notification.js';
 import { fetchShopifyData } from '../services/shopifyService.js';
+import { fetchGoogleAnalyticsData, fetchMailchimpData } from '../services/analyticsService.js';
 import { getIO } from '../config/socket.js';
 
 let workerInstance = null;
@@ -51,11 +52,11 @@ export const initializeWorker = (io) => {
             result = await fetchShopifyData(integrationId);
             break;
           case JOB_TYPES.SYNC_GOOGLE_ANALYTICS:
-            throw new Error('Google Analytics sync not implemented yet');
-          case JOB_TYPES.SYNC_FACEBOOK_ADS:
-            throw new Error('Facebook Ads sync not implemented yet');
+            result = await fetchGoogleAnalyticsData(integrationId);
+            break;
           case JOB_TYPES.SYNC_MAILCHIMP:
-            throw new Error('Mailchimp sync not implemented yet');
+            result = await fetchMailchimpData(integrationId);
+            break;
           default:
             throw new Error(`Unknown job type: ${job.name}`);
         }

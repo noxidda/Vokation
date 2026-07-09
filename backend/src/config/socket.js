@@ -26,7 +26,7 @@ export const setupSocket = (server) => {
       }
 
       // Verify token with Clerk
-      const claims = await clerk.verifyToken(token);
+      const claims = await clerk.verifyToken(token, { clockSkewInMs: 30000 });
 
       if (!claims) {
         return next(new Error('Invalid token'));

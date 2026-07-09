@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { ClerkProvider, AuthenticateWithRedirectCallback } from '@clerk/clerk-react';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import AuditLog from './pages/AuditLog';
 import BackgroundJobs from './pages/BackgroundJobs';
 import Pricing from './pages/Pricing';
+import LandingPage from './pages/LandingPage';
 import { SocketProvider } from './context/SocketContext';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -22,13 +23,14 @@ function App() {
   return (
     <ClerkProvider publishableKey={clerkPubKey}>
       <Provider store={store}>
-        <BrowserRouter>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
           <SocketProvider>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback signUpForceRedirectUrl="/dashboard" signInForceRedirectUrl="/dashboard" />} />
+              <Route path="/" element={<LandingPage />} />
               <Route element={<ProtectedRoute />}>
                 <Route element={<Layout />}>
                   <Route path="/dashboard" element={<Dashboard />} />

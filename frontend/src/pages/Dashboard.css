@@ -11,9 +11,9 @@
 
 .dashboard__title {
   font-family: var(--font-family);
-  font-weight: 700;
+  font-weight: 800;
   font-size: 28px;
-  color: var(--color-white);
+  color: var(--color-lavender);
   margin: 0;
 }
 
@@ -33,21 +33,18 @@
 .dashboard__sync-btn {
   padding: 0 20px;
   height: 36px;
-  background: transparent;
-  color: var(--color-white);
-  border: 1px solid var(--color-purple);
+  background: var(--color-black);
+  color: var(--color-lavender);
+  border: 1px solid var(--color-border);
   font-family: var(--font-family);
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
-  border-radius: var(--border-radius);
-  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .dashboard__sync-btn:hover:not(:disabled) {
-  background-color: var(--color-purple-dark);
-  border-color: var(--color-purple);
-  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+  border-color: var(--color-pink);
+  color: var(--color-pink);
 }
 
 .dashboard__sync-btn:disabled {
@@ -57,9 +54,9 @@
 
 .dashboard__subtitle {
   font-family: var(--font-family);
-  font-weight: 600;
-  font-size: 20px;
-  color: var(--color-white);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-lavender);
   margin-bottom: 20px;
 }
 
@@ -80,15 +77,13 @@
 .dashboard__metric-value {
   font-size: 32px;
   font-weight: 700;
-  color: var(--color-white);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  color: var(--color-lavender);
 }
 
 .dashboard__error {
-  background: rgba(236, 72, 153, 0.08);
+  background: var(--color-black);
   border: 1px solid var(--color-pink);
   padding: 24px;
-  border-radius: var(--border-radius);
   text-align: center;
   color: var(--color-pink);
 }
@@ -97,19 +92,17 @@
   margin-top: 16px;
   padding: 8px 24px;
   background: var(--color-pink);
-  color: var(--color-white);
-  border: none;
+  color: var(--color-black);
+  border: 1px solid var(--color-pink);
   font-family: var(--font-family);
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
-  border-radius: var(--border-radius);
-  box-shadow: 0 4px 10px rgba(236, 72, 153, 0.2);
-  transition: filter var(--transition-speed) ease;
 }
 
 .dashboard__retry:hover {
-  filter: brightness(1.1);
+  background: var(--color-black);
+  color: var(--color-pink);
 }
 
 @media (max-width: 1024px) {
@@ -137,8 +130,8 @@
 
 .metric-card__value {
   font-size: 28px;
-  font-weight: 700;
-  color: var(--color-white);
+  font-weight: 800;
+  color: var(--color-lavender);
   line-height: 1.2;
   margin-bottom: 4px;
 }

@@ -28,7 +28,7 @@ const BackgroundJobs = () => {
       await retryJob(jobId).unwrap();
       refetch();
     } catch (error) {
-      console.error('Failed to retry job:', error);
+      console.error('Failed to re-execute operation:', error);
     }
   };
 
@@ -43,11 +43,11 @@ const BackgroundJobs = () => {
   if (error) {
     return (
       <div className="jobs">
-        <h1 className="jobs__title">Sync Jobs</h1>
+        <h1 className="jobs__title">Synchronization Operations</h1>
         <div className="jobs__error">
-          <p>Failed to load jobs</p>
+          <p>Failed to retrieve operational queue.</p>
           <button className="jobs__retry" onClick={refetch}>
-            Retry
+            Retry Request
           </button>
         </div>
       </div>
@@ -56,8 +56,8 @@ const BackgroundJobs = () => {
 
   return (
     <div className="jobs">
-      <h1 className="jobs__title">Sync Jobs</h1>
-      <p className="jobs__subtitle">Monitor and manage sync jobs for your organization</p>
+      <h1 className="jobs__title">Synchronization Operations</h1>
+      <p className="jobs__subtitle">Monitor and manage asynchronous data synchronization processes.</p>
 
       <div className="jobs__filters">
         {statuses.map((status) => (
@@ -69,7 +69,7 @@ const BackgroundJobs = () => {
               setPage(1);
             }}
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status === 'all' ? 'All Operations' : status.charAt(0).toUpperCase() + status.slice(1)}
           </button>
         ))}
       </div>
@@ -78,33 +78,33 @@ const BackgroundJobs = () => {
         <table className="jobs__table">
           <thead>
             <tr>
-              <th>Platform</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Duration</th>
-              <th>Actions</th>
+              <th>Integration Endpoint</th>
+              <th>Execution Status</th>
+              <th>Initiation Time</th>
+              <th>Processing Duration</th>
+              <th>Control Action</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
                 <td colSpan="5" className="jobs__loading">
-                  Loading...
+                  Retrieving process queue...
                 </td>
               </tr>
             ) : data?.jobs?.length === 0 ? (
               <tr>
                 <td colSpan="5" className="jobs__empty">
-                  No jobs found
+                  No synchronization operational records found.
                 </td>
               </tr>
             ) : (
               data?.jobs?.map((job) => (
                 <tr key={job._id}>
-                  <td className="jobs__platform">{job.platform}</td>
+                  <td className="jobs__platform">{job.platform.toUpperCase()}</td>
                   <td>
                     <StatusBadge variant={getStatusVariant(job.status)}>
-                      {job.status}
+                      {job.status.toUpperCase()}
                     </StatusBadge>
                   </td>
                   <td>{new Date(job.createdAt).toLocaleString()}</td>
@@ -115,11 +115,11 @@ const BackgroundJobs = () => {
                         className="jobs__retry-btn"
                         onClick={() => handleRetry(job._id)}
                       >
-                        Retry
+                        Re-execute
                       </button>
                     )}
                     {job.status === 'processing' && (
-                      <span className="jobs__processing">Processing...</span>
+                      <span className="jobs__processing">Executing...</span>
                     )}
                   </td>
                 </tr>

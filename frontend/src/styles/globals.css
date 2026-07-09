@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 *,
 *::before,
@@ -11,31 +11,31 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #040209;
+  background-color: #000000;
 }
 
 :root {
-  --color-bg-deep: #040209;
-  --color-bg-panel: rgba(13, 9, 23, 0.6);
-  --color-bg-panel-solid: #0c0816;
-  --color-bg-card: rgba(20, 14, 34, 0.35);
-  --color-border: rgba(139, 92, 246, 0.15);
-  --color-border-hover: rgba(236, 72, 153, 0.35);
-  --color-border-glow: rgba(139, 92, 246, 0.3);
+  --color-bg-deep: #000000;
+  --color-bg-panel: #000000;
+  --color-bg-panel-solid: #000000;
+  --color-bg-card: #000000;
+  --color-border: #E2D9F3;
+  --color-border-hover: #9B7EB2;
+  --color-border-glow: #9B7EB2;
   
-  --color-lavender: #e2d9f3;
+  --color-lavender: #E2D9F3;
   --color-lavender-dark: #a197b4;
-  --color-purple: #8b5cf6;
-  --color-purple-dark: #6d28d9;
-  --color-pink: #ec4899;
-  --color-pink-dark: #be185d;
-  --color-violet: #4c1d95;
-  --color-white: #ffffff;
+  --color-purple: #9B7EB2;
+  --color-purple-dark: #2E223C;
+  --color-pink: #9B7EB2;
+  --color-pink-dark: #7E6194;
+  --color-violet: #9B7EB2;
+  --color-white: #E2D9F3;
   --color-black: #000000;
   
-  --font-family: 'Raleway', 'Inter', -apple-system, sans-serif;
-  --border-radius: 8px;
-  --transition-speed: 0.25s;
+  --font-family: 'DM Sans', 'Inter', -apple-system, sans-serif;
+  --border-radius: 0px;
+  --transition-speed: 0s;
 }
 
 body {
@@ -50,19 +50,17 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family);
   font-weight: 600;
-  color: var(--color-white);
+  color: var(--color-lavender);
   letter-spacing: -0.01em;
 }
 
 a {
-  color: var(--color-purple);
+  color: var(--color-lavender);
   text-decoration: none;
-  transition: color var(--transition-speed) ease, text-shadow var(--transition-speed) ease;
 }
 
 a:hover {
   color: var(--color-pink);
-  text-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
 }
 
 /* Scrollbar */
@@ -77,24 +75,20 @@ a:hover {
 
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 3px;
+  border-radius: 0px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-purple);
+  background: var(--color-pink);
 }
 
-/* Glassmorphism panel base */
+/* Flat panel base */
 .panel-glass {
-  background: var(--color-bg-panel);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-bg-panel-solid);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
-  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
 .panel-glass:hover {
   border-color: var(--color-border-hover);
-  box-shadow: 0 0 15px rgba(236, 72, 153, 0.08);
 }

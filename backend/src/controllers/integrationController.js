@@ -295,12 +295,208 @@ export const connectIntegration = async (req, res) => {
       }
     }
     
-    // Continue with connection logic...
+    // Default manual connection logic for custom platforms (optional fallback)
+    const integration = await Integration.create({
+      organizationId,
+      platform,
+      accessToken: encrypt('manual_token'),
+      platformStoreId: `${platform}_manual`,
+      isActive: true,
+    });
+
+    res.status(200).json({
+      message: 'Integration connected successfully',
+      integration,
+    });
   } catch (error) {
     console.error('Connect integration error:', error);
     res.status(500).json({
       error: true,
       message: 'Failed to connect integration',
     });
+  }
+};
+
+// Google Analytics Connect
+export const initiateGoogleConnect = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const state = crypto.randomBytes(16).toString('hex');
+    
+    oauthStates.set(state, {
+      organizationId,
+      timestamp: Date.now(),
+    });
+
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    const scope = 'https://www.googleapis.com/auth/analytics.readonly';
+    
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}&access_type=offline&prompt=consent`;
+
+    res.redirect(authUrl);
+  } catch (error) {
+    console.error('Initiate Google Analytics connect error:', error);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/integrations?error=google_analytics`);
+  }
+};
+
+// Google Analytics Callback
+export const googleCallback = async (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  try {
+    const { code, state } = req.query;
+
+    const stateData = oauthStates.get(state);
+    if (!stateData) {
+      return res.redirect(`${frontendUrl}/integrations?error=google_analytics`);
+    }
+
+    oauthStates.delete(state);
+
+    // Exchange auth code for tokens
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        code,
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        grant_type: 'authorization_code',
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      throw new Error(tokenData.error || 'Failed to exchange token with Google');
+    }
+
+    const encryptedToken = encrypt(tokenData.access_token);
+    const encryptedRefreshToken = tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null;
+
+    // Save integration
+    await Integration.create({
+      organizationId: stateData.organizationId,
+      platform: 'google_analytics',
+      accessToken: encryptedToken,
+      refreshToken: encryptedRefreshToken,
+      platformStoreId: 'Google Analytics Property',
+      isActive: true,
+    });
+
+    // Create audit log
+    await AuditLog.create({
+      organizationId: stateData.organizationId,
+      userId: req.userId || 'system',
+      action: 'connected_integration',
+      metadata: { platform: 'google_analytics' },
+    });
+
+    res.redirect(`${frontendUrl}/integrations?success=google_analytics`);
+  } catch (error) {
+    console.error('Google Analytics callback error:', error);
+    res.redirect(`${frontendUrl}/integrations?error=google_analytics`);
+  }
+};
+
+// Mailchimp Connect
+export const initiateMailchimpConnect = async (req, res) => {
+  try {
+    const { organizationId } = req;
+    const state = crypto.randomBytes(16).toString('hex');
+    
+    oauthStates.set(state, {
+      organizationId,
+      timestamp: Date.now(),
+    });
+
+    const redirectUri = process.env.MAILCHIMP_REDIRECT_URI;
+    const clientId = process.env.MAILCHIMP_CLIENT_ID;
+    
+    const authUrl = `https://login.mailchimp.com/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&state=${state}`;
+
+    res.redirect(authUrl);
+  } catch (error) {
+    console.error('Initiate Mailchimp connect error:', error);
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/integrations?error=mailchimp`);
+  }
+};
+
+// Mailchimp Callback
+export const mailchimpCallback = async (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+  try {
+    const { code, state } = req.query;
+
+    const stateData = oauthStates.get(state);
+    if (!stateData) {
+      return res.redirect(`${frontendUrl}/integrations?error=mailchimp`);
+    }
+
+    oauthStates.delete(state);
+
+    // Exchange auth code for tokens
+    const tokenResponse = await fetch('https://login.mailchimp.com/oauth2/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: process.env.MAILCHIMP_CLIENT_ID,
+        client_secret: process.env.MAILCHIMP_CLIENT_SECRET,
+        code,
+        redirect_uri: process.env.MAILCHIMP_REDIRECT_URI,
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      throw new Error(tokenData.error || 'Failed to exchange token with Mailchimp');
+    }
+
+    const accessToken = tokenData.access_token;
+    
+    // Fetch Mailchimp metadata to get dc (data center)
+    const metadataResponse = await fetch('https://login.mailchimp.com/oauth2/metadata', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    
+    const metadata = await metadataResponse.json();
+    const dc = metadata.dc || 'us1';
+    const accountName = metadata.accountname || 'Mailchimp Account';
+
+    const encryptedToken = encrypt(accessToken);
+
+    // Save integration
+    await Integration.create({
+      organizationId: stateData.organizationId,
+      platform: 'mailchimp',
+      accessToken: encryptedToken,
+      platformStoreId: accountName,
+      isActive: true,
+    });
+
+    // Create audit log
+    await AuditLog.create({
+      organizationId: stateData.organizationId,
+      userId: req.userId || 'system',
+      action: 'connected_integration',
+      metadata: { platform: 'mailchimp', account: accountName },
+    });
+
+    res.redirect(`${frontendUrl}/integrations?success=mailchimp`);
+  } catch (error) {
+    console.error('Mailchimp callback error:', error);
+    res.redirect(`${frontendUrl}/integrations?error=mailchimp`);
   }
 };

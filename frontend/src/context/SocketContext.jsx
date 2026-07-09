@@ -18,6 +18,8 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
+    let activeSocket = null;
+
     if (!isLoaded || !isSignedIn) {
       if (socket) {
         socket.disconnect();
@@ -37,6 +39,8 @@ export const SocketProvider = ({ children }) => {
           transports: ['websocket'],
           withCredentials: true,
         });
+
+        activeSocket = socketInstance;
 
         socketInstance.on('connect', () => {
           console.log('[Socket] Socket connected to Vokation');
@@ -62,8 +66,8 @@ export const SocketProvider = ({ children }) => {
     initSocket();
 
     return () => {
-      if (socket) {
-        socket.disconnect();
+      if (activeSocket) {
+        activeSocket.disconnect();
       }
     };
   }, [isLoaded, isSignedIn]);

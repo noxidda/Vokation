@@ -21,14 +21,12 @@ const AuditLog = () => {
   const [exportLogs] = useExportAuditLogsMutation();
   const { socket } = useSocket();
 
-  // Listen for new audit entries
   useEffect(() => {
     if (!socket) return;
 
     const handleNewAudit = (data) => {
       if (data.organizationId === localStorage.getItem('orgId')) {
         setNewEntryIndicator(true);
-        // Auto-refresh after 2 seconds
         setTimeout(() => {
           refetch();
           setNewEntryIndicator(false);
@@ -44,15 +42,15 @@ const AuditLog = () => {
   }, [socket, refetch]);
 
   const actions = [
-    { value: '', label: 'All Actions' },
-    { value: 'platform.connected', label: 'Platform Connected' },
-    { value: 'platform.disconnected', label: 'Platform Disconnected' },
-    { value: 'platform.synced', label: 'Platform Synced' },
-    { value: 'team.member_invited', label: 'Team Member Invited' },
-    { value: 'team.role_changed', label: 'Role Changed' },
-    { value: 'team.member_removed', label: 'Member Removed' },
-    { value: 'subscription.upgraded', label: 'Subscription Upgraded' },
-    { value: 'settings.updated', label: 'Settings Updated' },
+    { value: '', label: 'All Event Types' },
+    { value: 'platform.connected', label: 'Platform Connection Established' },
+    { value: 'platform.disconnected', label: 'Platform Connection Terminated' },
+    { value: 'platform.synced', label: 'Platform Data Synchronized' },
+    { value: 'team.member_invited', label: 'Privilege Invitation Dispatched' },
+    { value: 'team.role_changed', label: 'Role Privilege Modified' },
+    { value: 'team.member_removed', label: 'Access Authorization Revoked' },
+    { value: 'subscription.upgraded', label: 'Service Agreement Upgraded' },
+    { value: 'settings.updated', label: 'System Configurations Modified' },
   ];
 
   const getActionBadge = (action) => {
@@ -68,14 +66,14 @@ const AuditLog = () => {
     const variant = categories[category]?.color || 'info';
     
     const labels = {
-      'platform.connected': 'Connected',
-      'platform.disconnected': 'Disconnected',
-      'platform.synced': 'Synced',
-      'team.member_invited': 'Member Invited',
-      'team.role_changed': 'Role Changed',
-      'team.member_removed': 'Member Removed',
+      'platform.connected': 'Established',
+      'platform.disconnected': 'Terminated',
+      'platform.synced': 'Synchronized',
+      'team.member_invited': 'Invite Sent',
+      'team.role_changed': 'Privilege Modified',
+      'team.member_removed': 'Access Revoked',
       'subscription.upgraded': 'Upgraded',
-      'settings.updated': 'Settings Updated',
+      'settings.updated': 'Settings Modified',
     };
     
     return {
@@ -103,18 +101,18 @@ const AuditLog = () => {
       a.click();
       a.remove();
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error('Export operation failed:', error);
     }
   };
 
   if (error) {
     return (
       <div className="audit">
-        <h1 className="audit__title">Audit Log</h1>
+        <h1 className="audit__title">Security Audit Trail</h1>
         <div className="audit__error">
-          <p>Failed to load audit logs</p>
+          <p>Failed to retrieve audit trail records.</p>
           <button className="audit__retry" onClick={refetch}>
-            Retry
+            Retry Request
           </button>
         </div>
       </div>
@@ -125,17 +123,17 @@ const AuditLog = () => {
     <div className="audit">
       <div className="audit__header">
         <div>
-          <h1 className="audit__title">Audit Log</h1>
-          <p className="audit__subtitle">Track all activity in your organization</p>
+          <h1 className="audit__title">Security Audit Trail</h1>
+          <p className="audit__subtitle">Comprehensive chronological log of administrative and platform operations.</p>
         </div>
         <button className="audit__export-btn" onClick={handleExport}>
-          Export Logs
+          Export Trail
         </button>
       </div>
 
       {newEntryIndicator && (
         <div className="audit__new-entry">
-          New audit entries available
+          New activity recorded.
         </div>
       )}
 
@@ -157,7 +155,7 @@ const AuditLog = () => {
           value={filters.userId}
           onChange={(e) => handleFilterChange('userId', e.target.value)}
         >
-          <option value="">All Users</option>
+          <option value="">All Operators</option>
           {teamMembers?.map(member => (
             <option key={member._id} value={member._id}>
               {member.firstName} {member.lastName}
@@ -182,7 +180,7 @@ const AuditLog = () => {
         />
 
         <button className="audit__filter-apply" onClick={() => refetch()}>
-          Apply Filters
+          Query Logs
         </button>
 
         <button 
@@ -192,7 +190,7 @@ const AuditLog = () => {
             refetch();
           }}
         >
-          Clear
+          Reset Query
         </button>
       </div>
 
@@ -200,24 +198,24 @@ const AuditLog = () => {
         <table className="audit__table">
           <thead>
             <tr>
-              <th>Timestamp</th>
-              <th>User</th>
-              <th>Action</th>
-              <th>Resource</th>
-              <th>IP Address</th>
+              <th>Recorded Time</th>
+              <th>Operator</th>
+              <th>Event Type</th>
+              <th>Subject Resource</th>
+              <th>Network IP Address</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
                 <td colSpan="5" className="audit__loading">
-                  Loading...
+                  Retrieving log entries...
                 </td>
               </tr>
             ) : auditData?.logs?.length === 0 ? (
               <tr>
                 <td colSpan="5" className="audit__empty">
-                  No audit logs found
+                  No audit log matches found.
                 </td>
               </tr>
             ) : (
@@ -233,7 +231,7 @@ const AuditLog = () => {
                         {new Date(log.timestamp).toLocaleString()}
                       </td>
                       <td>
-                        {log.userId ? `${log.userId.firstName} ${log.userId.lastName}` : 'Unknown'}
+                        {log.userId ? `${log.userId.firstName} ${log.userId.lastName}` : 'System Node'}
                       </td>
                       <td>
                         <StatusBadge variant={badge.variant}>
@@ -254,7 +252,7 @@ const AuditLog = () => {
                       <tr className="audit__expanded">
                         <td colSpan="5">
                           <div className="audit__details">
-                            <strong>Details:</strong>
+                            <strong>Event Parameters:</strong>
                             <pre className="audit__json">
                               {JSON.stringify(log.details || {}, null, 2)}
                             </pre>

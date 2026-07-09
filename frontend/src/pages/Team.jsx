@@ -27,7 +27,7 @@ const Team = () => {
       setInviteRole('viewer');
       refetch();
     } catch (err) {
-      console.error('Failed to invite member:', err);
+      console.error('Failed to issue invitation:', err);
     }
   };
 
@@ -36,17 +36,17 @@ const Team = () => {
       await changeRole({ userId, role }).unwrap();
       refetch();
     } catch (err) {
-      console.error('Failed to change role:', err);
+      console.error('Role update operation failed:', err);
     }
   };
 
   const handleRemove = async (userId) => {
-    if (window.confirm('Are you sure you want to remove this member?')) {
+    if (window.confirm('Confirm removal of user authorization?')) {
       try {
         await removeMember(userId).unwrap();
         refetch();
       } catch (err) {
-        console.error('Failed to remove member:', err);
+        console.error('User removal operation failed:', err);
       }
     }
   };
@@ -54,11 +54,11 @@ const Team = () => {
   if (error) {
     return (
       <div className="team">
-        <h1 className="team__title">Team</h1>
+        <h1 className="team__title">Workspace Access Management</h1>
         <div className="team__error">
-          <p>Failed to load team members</p>
+          <p>Failed to retrieve active users.</p>
           <button className="team__retry" onClick={refetch}>
-            Retry
+            Retry Request
           </button>
         </div>
       </div>
@@ -69,14 +69,14 @@ const Team = () => {
     <div className="team">
       <div className="team__header">
         <div>
-          <h1 className="team__title">Team</h1>
-          <p className="team__subtitle">Manage your organization members</p>
+          <h1 className="team__title">Workspace Access Management</h1>
+          <p className="team__subtitle">Administer workspace access privileges and role delegations.</p>
         </div>
         <button 
           className="team__invite-btn"
           onClick={() => setShowInviteModal(true)}
         >
-          + Invite Member
+          Invite User
         </button>
       </div>
 
@@ -84,24 +84,24 @@ const Team = () => {
         <table className="team__table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Joined</th>
-              <th>Actions</th>
+              <th>Authorized Name</th>
+              <th>Email Endpoint</th>
+              <th>Role Privilege</th>
+              <th>Authorization Date</th>
+              <th>Administrative Control</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
               <tr>
                 <td colSpan="5" className="team__loading">
-                  Loading...
+                  Retrieving directory...
                 </td>
               </tr>
             ) : members?.length === 0 ? (
               <tr>
                 <td colSpan="5" className="team__empty">
-                  No members found
+                  No active user records found.
                 </td>
               </tr>
             ) : (
@@ -113,7 +113,7 @@ const Team = () => {
                   <td>{member.email}</td>
                   <td>
                     <span className={`team__role team__role--${member.role}`}>
-                      {member.role}
+                      {member.role === 'admin' ? 'Administrator' : 'Viewer'}
                     </span>
                   </td>
                   <td>
@@ -127,7 +127,7 @@ const Team = () => {
                         onChange={(e) => handleRoleChange(member._id, e.target.value)}
                         disabled={member.role === 'admin' && members.length === 1}
                       >
-                        <option value="admin">Admin</option>
+                        <option value="admin">Administrator</option>
                         <option value="viewer">Viewer</option>
                       </select>
                       <button
@@ -135,7 +135,7 @@ const Team = () => {
                         onClick={() => handleRemove(member._id)}
                         disabled={member.role === 'admin' && members.length === 1}
                       >
-                        Remove
+                        Revoke Access
                       </button>
                     </div>
                   </td>
@@ -149,31 +149,31 @@ const Team = () => {
       <Modal
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
-        title="Invite Team Member"
-        confirmText={isInviting ? 'Sending...' : 'Send Invitation'}
+        title="Delegate Workspace Invite"
+        confirmText={isInviting ? 'Dispatched...' : 'Send Invitation'}
         onConfirm={handleInvite}
       >
         <form onSubmit={handleInvite}>
           <div className="team__form-group">
-            <label className="team__label">Email Address</label>
+            <label className="team__label">Target Email Address</label>
             <input
               type="email"
               className="team__input"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
               required
-              placeholder="colleague@company.com"
+              placeholder="user@organization.com"
             />
           </div>
           <div className="team__form-group">
-            <label className="team__label">Role</label>
+            <label className="team__label">Assigned Privilege Tier</label>
             <select
               className="team__select team__select--full"
               value={inviteRole}
               onChange={(e) => setInviteRole(e.target.value)}
             >
               <option value="viewer">Viewer</option>
-              <option value="admin">Admin</option>
+              <option value="admin">Administrator</option>
             </select>
           </div>
         </form>

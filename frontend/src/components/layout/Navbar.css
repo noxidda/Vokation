@@ -1,0 +1,234 @@
+.navbar {
+  width: 100%;
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-deep);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar__container {
+  max-width: 1248px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar__left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.navbar__brand {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-pink);
+  letter-spacing: 0.1em;
+  text-decoration: none;
+}
+
+.navbar__links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar__link {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-lavender-dark);
+  text-decoration: none;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar__link:hover {
+  color: var(--color-lavender);
+}
+
+.navbar__link--active {
+  color: var(--color-pink);
+  border-bottom-color: var(--color-pink);
+}
+
+.navbar__right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar__upgrade-btn {
+  background-color: var(--color-pink);
+  color: var(--color-black);
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1px solid var(--color-pink);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.navbar__upgrade-btn:hover {
+  background-color: var(--color-black);
+  color: var(--color-pink);
+}
+
+.navbar__badge--pro {
+  background-color: var(--color-black);
+  color: var(--color-lavender);
+  border: 1px solid var(--color-border);
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.navbar__notifications {
+  position: relative;
+}
+
+.navbar__bell {
+  background: none;
+  border: none;
+  color: var(--color-lavender);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  position: relative;
+}
+
+.navbar__bell:hover {
+  color: var(--color-pink);
+}
+
+.navbar__bell-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-pink);
+}
+
+.navbar__dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 12px;
+  width: 320px;
+  background-color: var(--color-black);
+  border: 1px solid var(--color-border);
+  z-index: 100;
+}
+
+.navbar__dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-lavender);
+}
+
+.navbar__dropdown-mark-read {
+  background: none;
+  border: none;
+  color: var(--color-pink);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar__dropdown-mark-read:hover {
+  text-decoration: underline;
+}
+
+.navbar__dropdown-body {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.navbar__notification {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-lavender-dark);
+}
+
+.navbar__notification:last-child {
+  border-bottom: none;
+}
+
+.navbar__notification--unread {
+  background-color: #0b0811;
+  color: var(--color-lavender);
+}
+
+.navbar__notification-title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.navbar__notification-message {
+  line-height: 1.4;
+}
+
+.navbar__notification-time {
+  font-size: 10px;
+  color: var(--color-lavender-dark);
+  margin-top: 6px;
+  text-align: right;
+}
+
+.navbar__notification-empty {
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-lavender-dark);
+}
+
+.navbar__user-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar__user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-lavender);
+}
+
+.navbar__signout-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-lavender);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.navbar__signout-btn:hover {
+  border-color: var(--color-pink);
+  color: var(--color-pink);
+}
+
+.navbar__toasts {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 400px;
+  width: 100%;
+}

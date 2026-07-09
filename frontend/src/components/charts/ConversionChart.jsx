@@ -48,24 +48,24 @@ const ConversionChart = ({ data, isLoading }) => {
       {
         label: 'Conversion Rate',
         data: data.map(d => d.rate),
-        borderColor: '#ec4899',
-        backgroundColor: '#ec4899',
+        borderColor: '#9B7EB2',
+        backgroundColor: '#9B7EB2',
         borderWidth: 2,
         pointRadius: 3,
         pointHoverRadius: 5,
-        tension: 0.2,
+        tension: 0,
         fill: false,
         yAxisID: 'y',
       },
       {
         label: 'Visitors',
         data: data.map(d => d.visitors),
-        borderColor: '#8b5cf6',
-        backgroundColor: '#8b5cf6',
+        borderColor: '#E2D9F3',
+        backgroundColor: '#E2D9F3',
         borderWidth: 2,
         pointRadius: 3,
         pointHoverRadius: 5,
-        tension: 0.2,
+        tension: 0,
         fill: false,
         yAxisID: 'y1',
       },
@@ -81,7 +81,7 @@ const ConversionChart = ({ data, isLoading }) => {
         position: 'top',
         labels: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '500',
             size: 11,
           },
@@ -92,20 +92,20 @@ const ConversionChart = ({ data, isLoading }) => {
         },
       },
       tooltip: {
-        backgroundColor: '#0d0917',
-        titleColor: '#ffffff',
-        bodyColor: '#e2d9f3',
-        borderColor: 'rgba(139, 92, 246, 0.3)',
+        backgroundColor: '#000000',
+        titleColor: '#E2D9F3',
+        bodyColor: '#E2D9F3',
+        borderColor: '#E2D9F3',
         borderWidth: 1,
-        cornerRadius: 6,
+        cornerRadius: 0,
         padding: 12,
         titleFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '600',
           size: 12,
         },
         bodyFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '400',
           size: 12,
         },
@@ -118,7 +118,7 @@ const ConversionChart = ({ data, isLoading }) => {
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 10,
           },
@@ -127,7 +127,7 @@ const ConversionChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
       },
       y: {
@@ -135,13 +135,11 @@ const ConversionChart = ({ data, isLoading }) => {
         display: true,
         position: 'left',
         grid: {
-          display: true,
-          color: 'rgba(139, 92, 246, 0.08)',
-          drawBorder: false,
+          display: false,
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 10,
           },
@@ -152,7 +150,7 @@ const ConversionChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
         beginAtZero: true,
       },

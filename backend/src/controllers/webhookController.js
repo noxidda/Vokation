@@ -83,6 +83,7 @@ const handleOrderPaid = async (payload) => {
     
     // Find payment record
     const paymentRecord = await Payment.findOne({ razorpayOrderId: order.id });
+    const plan = paymentRecord?.plan || order.notes?.plan || 'pro';
     if (paymentRecord) {
       paymentRecord.razorpayPaymentId = payment.id;
       paymentRecord.status = 'paid';
@@ -98,7 +99,11 @@ const handleOrderPaid = async (payload) => {
       organization.subscriptionStatus = 'active';
       
       const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
+      if (plan === 'pro_annual') {
+        expiryDate.setFullYear(expiryDate.getFullYear() + 1); // 1 year
+      } else {
+        expiryDate.setDate(expiryDate.getDate() + 30); // 30 days
+      }
       organization.subscriptionExpiry = expiryDate;
       await organization.save();
       

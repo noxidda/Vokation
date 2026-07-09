@@ -4,7 +4,7 @@ import { useGetIntegrationsQuery, useDisconnectIntegrationMutation, useSyncInteg
 import Card from '../components/ui/Card';
 import StatusBadge from '../components/ui/StatusBadge';
 import NotificationToast from '../components/ui/NotificationToast';
-import { ShoppingBag, BarChart2, Megaphone, Mail } from 'lucide-react';
+import Modal from '../components/ui/Modal';
 import './Integrations.css';
 
 const Integrations = () => {
@@ -14,32 +14,33 @@ const Integrations = () => {
   const [disconnectIntegration] = useDisconnectIntegrationMutation();
   const [syncIntegration, { isLoading: isSyncing }] = useSyncIntegrationMutation();
 
-  // Handle callback success/error
+  const [showShopifyModal, setShowShopifyModal] = useState(false);
+  const [shopifyDomain, setShopifyDomain] = useState('');
+
   useEffect(() => {
     const success = searchParams.get('success');
-    const error = searchParams.get('error');
+    const errorParam = searchParams.get('error');
 
     if (success === 'shopify') {
       setToast({
         type: 'success',
-        title: 'Shopify Connected',
-        message: 'Your Shopify store has been connected successfully!',
+        title: 'Integration Established',
+        message: 'The Shopify platform connection has been successfully established.',
       });
       refetch();
-    } else if (error === 'shopify') {
+    } else if (errorParam === 'shopify') {
       setToast({
         type: 'error',
-        title: 'Connection Failed',
-        message: 'Failed to connect Shopify. Please try again.',
+        title: 'Integration Failure',
+        message: 'Failed to establish Shopify platform connection. Please verify credentials.',
       });
     }
   }, [searchParams, refetch]);
 
   const platforms = [
-    { id: 'shopify', name: 'Shopify', icon: <ShoppingBag size={20} />, available: true },
-    { id: 'google_analytics', name: 'Google Analytics', icon: <BarChart2 size={20} />, available: false },
-    { id: 'facebook_ads', name: 'Facebook Ads', icon: <Megaphone size={20} />, available: false },
-    { id: 'mailchimp', name: 'Mailchimp', icon: <Mail size={20} />, available: false },
+    { id: 'shopify', name: 'Shopify Storefront', available: true },
+    { id: 'google_analytics', name: 'Google Analytics', available: true },
+    { id: 'mailchimp', name: 'Mailchimp Campaign Manager', available: true },
   ];
 
   const getPlatformStatus = (platformId) => {
@@ -51,30 +52,40 @@ const Integrations = () => {
     };
   };
 
-  const handleConnect = (platformId) => {
+  const handleConnectClick = (platformId) => {
+    const token = localStorage.getItem('clerk-token');
     if (platformId === 'shopify') {
-      const shop = prompt('Enter your Shopify store domain (e.g., mystore.myshopify.com):');
-      if (shop) {
-        window.location.href = `${import.meta.env.VITE_API_URL}/integrations/shopify/connect?shop=${shop}`;
-      }
+      setShopifyDomain('');
+      setShowShopifyModal(true);
+    } else if (platformId === 'google_analytics' || platformId === 'mailchimp') {
+      window.location.href = `${import.meta.env.VITE_API_URL}/integrations/${platformId}/connect?token=${token}`;
+    }
+  };
+
+  const handleShopifyConnectSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (shopifyDomain.trim()) {
+      setShowShopifyModal(false);
+      const token = localStorage.getItem('clerk-token');
+      window.location.href = `${import.meta.env.VITE_API_URL}/integrations/shopify/connect?shop=${shopifyDomain.trim()}&token=${token}`;
     }
   };
 
   const handleDisconnect = async (platformId) => {
-    if (window.confirm(`Are you sure you want to disconnect ${platformId}?`)) {
+    if (window.confirm(`Confirm disconnection of ${platformId} integration?`)) {
       try {
         await disconnectIntegration({ platform: platformId }).unwrap();
         refetch();
         setToast({
           type: 'success',
-          title: 'Disconnected',
-          message: `${platformId} has been disconnected.`,
+          title: 'Integration Terminated',
+          message: `The ${platformId} platform has been disconnected.`,
         });
       } catch (error) {
         setToast({
           type: 'error',
-          title: 'Error',
-          message: 'Failed to disconnect. Please try again.',
+          title: 'Operation Failed',
+          message: 'Failed to terminate integration. Please retry.',
         });
       }
     }
@@ -85,14 +96,14 @@ const Integrations = () => {
       await syncIntegration({ platform: platformId }).unwrap();
       setToast({
         type: 'info',
-        title: 'Sync Started',
-        message: `Syncing ${platformId} data...`,
+        title: 'Synchronization Initiated',
+        message: `Request to sync ${platformId} data has been dispatched.`,
       });
     } catch (error) {
       setToast({
         type: 'error',
-        title: 'Sync Failed',
-        message: error.message || 'Failed to start sync',
+        title: 'Synchronization Failed',
+        message: error.message || 'Failed to dispatch synchronization request.',
       });
     }
   };
@@ -100,11 +111,11 @@ const Integrations = () => {
   if (error) {
     return (
       <div className="integrations">
-        <h1 className="integrations__title">Integrations</h1>
+        <h1 className="integrations__title">Platform Integrations</h1>
         <div className="integrations__error">
-          <p>Failed to load integrations</p>
+          <p>Failed to retrieve integrations.</p>
           <button className="integrations__retry" onClick={refetch}>
-            Retry
+            Retry Request
           </button>
         </div>
       </div>
@@ -113,9 +124,9 @@ const Integrations = () => {
 
   return (
     <div className="integrations">
-      <h1 className="integrations__title">Integrations</h1>
+      <h1 className="integrations__title">Platform Integrations</h1>
       <p className="integrations__subtitle">
-        Connect your platforms to sync data
+        Connect external API providers to consolidate organization metrics.
       </p>
 
       {toast && (
@@ -140,27 +151,26 @@ const Integrations = () => {
             >
               <div className="integration-card__content">
                 <div className="integration-card__header">
-                  <span className="integration-card__icon">{platform.icon}</span>
                   <h3 className="integration-card__name">{platform.name}</h3>
                   <StatusBadge variant={status.connected ? 'success' : 'info'}>
-                    {status.connected ? 'Connected' : 'Not Connected'}
+                    {status.connected ? 'Active' : 'Inactive'}
                   </StatusBadge>
                 </div>
                 
                 {status.connected && status.data && (
                   <div className="integration-card__details">
                     <div className="integration-card__store">
-                      {status.data.platformStoreId}
+                      Endpoint ID: {status.data.platformStoreId}
                     </div>
                     {status.data.cachedData?.lastFetched && (
                       <div className="integration-card__last-synced">
-                        Last synced: {new Date(status.data.cachedData.lastFetched).toLocaleString()}
+                        Last sync: {new Date(status.data.cachedData.lastFetched).toLocaleString()}
                       </div>
                     )}
                     {status.data.cachedData?.metrics && (
                       <div className="integration-card__metrics">
-                        <span>₹{status.data.cachedData.metrics.revenue?.toLocaleString('en-IN') || 0} revenue</span>
-                        <span>{status.data.cachedData.metrics.orders || 0} orders</span>
+                        <span>₹{status.data.cachedData.metrics.revenue?.toLocaleString('en-IN') || 0} Gross</span>
+                        <span>{status.data.cachedData.metrics.orders || 0} Transactions</span>
                       </div>
                     )}
                   </div>
@@ -174,7 +184,7 @@ const Integrations = () => {
                         onClick={() => handleSync(platform.id)}
                         disabled={isSyncing}
                       >
-                        {isSyncing ? 'Syncing...' : 'Sync'}
+                        {isSyncing ? 'Synchronizing...' : 'Request Sync'}
                       </button>
                       <button 
                         className="integration-card__btn integration-card__btn--disconnect"
@@ -186,10 +196,10 @@ const Integrations = () => {
                   ) : (
                     <button 
                       className="integration-card__btn integration-card__btn--connect"
-                      onClick={() => handleConnect(platform.id)}
+                      onClick={() => handleConnectClick(platform.id)}
                       disabled={!platform.available}
                     >
-                      {platform.available ? 'Connect' : 'Coming Soon'}
+                      {platform.available ? 'Establish Connection' : 'Unsupported'}
                     </button>
                   )}
                 </div>
@@ -198,6 +208,28 @@ const Integrations = () => {
           );
         })}
       </div>
+
+      <Modal
+        isOpen={showShopifyModal}
+        onClose={() => setShowShopifyModal(false)}
+        title="Connect Shopify Storefront"
+        confirmText="Connect Store"
+        onConfirm={handleShopifyConnectSubmit}
+      >
+        <form onSubmit={handleShopifyConnectSubmit}>
+          <div className="shopify-form">
+            <label className="shopify-form__label">Shopify Store Domain</label>
+            <input
+              type="text"
+              className="shopify-form__input"
+              value={shopifyDomain}
+              onChange={(e) => setShopifyDomain(e.target.value)}
+              placeholder="mystore.myshopify.com"
+              required
+            />
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

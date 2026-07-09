@@ -3,12 +3,12 @@ import redis from '../config/redis.js';
 import BackgroundJob from '../models/BackgroundJob.js';
 import Notification from '../models/Notification.js';
 import { fetchShopifyData } from './shopifyService.js';
+import { fetchGoogleAnalyticsData, fetchMailchimpData } from './analyticsService.js';
 import { getIO } from '../config/socket.js';
 
 export const JOB_TYPES = {
   SYNC_SHOPIFY: 'sync-shopify',
   SYNC_GOOGLE_ANALYTICS: 'sync-google-analytics',
-  SYNC_FACEBOOK_ADS: 'sync-facebook-ads',
   SYNC_MAILCHIMP: 'sync-mailchimp',
 };
 
@@ -77,6 +77,10 @@ export const queueSyncJob = async (organizationId, platform, integrationId) => {
           let result;
           if (platform === 'shopify') {
             result = await fetchShopifyData(integrationId);
+          } else if (platform === 'google_analytics') {
+            result = await fetchGoogleAnalyticsData(integrationId);
+          } else if (platform === 'mailchimp') {
+            result = await fetchMailchimpData(integrationId);
           } else {
             throw new Error(`${platform} sync not implemented yet`);
           }

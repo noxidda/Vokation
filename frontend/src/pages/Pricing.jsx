@@ -1,29 +1,30 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useGetSubscriptionStatusQuery, useCreateOrderMutation } from '../features/payment/paymentSlice';
 import NotificationToast from '../components/ui/NotificationToast';
 import './Pricing.css';
 
 const Pricing = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { data: subscription, refetch } = useGetSubscriptionStatusQuery();
   const [createOrder, { isLoading }] = useCreateOrderMutation();
   const [toast, setToast] = useState(null);
 
   const features = [
-    { name: 'Platform Connections', free: '1', pro: 'Unlimited' },
-    { name: 'Sync Frequency', free: 'Manual', pro: 'Auto hourly' },
-    { name: 'Team Members', free: '2', pro: 'Unlimited' },
-    { name: 'Data Retention', free: '30 days', pro: '12 months' },
-    { name: 'CSV Export', free: 'No', pro: 'Yes' },
-    { name: 'Email Support', free: 'Community', pro: 'Priority' },
+    { name: 'Platform Connections', free: '1 Active Endpoint', pro: 'Unlimited Endpoints' },
+    { name: 'Sync Frequency', free: 'Manual Trigger', pro: 'Automated (Hourly)' },
+    { name: 'Team Members', free: '2 Seat Limit', pro: 'Unlimited Seats' },
+    { name: 'Data Retention', free: '30 Days Historical', pro: '365 Days Historical' },
+    { name: 'CSV Export', free: 'Not Supported', pro: 'Supported' },
+    { name: 'Customer Support', free: 'Self-Serve Portal', pro: 'Priority Service Level' },
   ];
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (plan) => {
     try {
-      const result = await createOrder({ plan: 'pro' }).unwrap();
+      const result = await createOrder({ plan }).unwrap();
       
-      // Load Razorpay checkout
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => {
@@ -32,10 +33,9 @@ const Pricing = () => {
           amount: result.amount,
           currency: 'INR',
           name: 'Vokation',
-          description: 'Pro Plan Subscription',
+          description: plan === 'pro_annual' ? 'Premium Annual Service Agreement' : 'Premium Service Agreement',
           order_id: result.orderId,
           handler: function(response) {
-            // Verify payment on backend
             verifyPayment(response);
           },
           prefill: {
@@ -43,7 +43,7 @@ const Pricing = () => {
             email: user?.emailAddresses?.[0]?.emailAddress || '',
           },
           theme: {
-            color: '#8b5cf6',
+            color: '#9B7EB2',
           },
           modal: {
             backdropclose: false,
@@ -57,8 +57,8 @@ const Pricing = () => {
     } catch (error) {
       setToast({
         type: 'error',
-        title: 'Payment Error',
-        message: error.message || 'Failed to initiate payment',
+        title: 'Payment Initialization Failed',
+        message: error.message || 'Unable to establish payment session.',
       });
     }
   };
@@ -83,25 +83,25 @@ const Pricing = () => {
       if (data.success) {
         setToast({
           type: 'success',
-          title: 'Upgrade Successful',
-          message: 'Welcome to Vokation Pro!',
+          title: 'Upgrade Succeeded',
+          message: 'Workspace has been upgraded to Premium tier.',
         });
         refetch();
         setTimeout(() => {
-          window.location.href = '/dashboard?upgrade=success';
+          navigate('/dashboard?upgrade=success');
         }, 1500);
       } else {
         setToast({
           type: 'error',
           title: 'Verification Failed',
-          message: data.message || 'Payment verification failed',
+          message: data.message || 'Signature verification failed.',
         });
       }
     } catch (error) {
       setToast({
         type: 'error',
-        title: 'Error',
-        message: 'Failed to verify payment',
+        title: 'Network Error',
+        message: 'Failed to verify transaction signature.',
       });
     }
   };
@@ -110,9 +110,12 @@ const Pricing = () => {
 
   return (
     <div className="pricing">
+      <button className="pricing__back-btn" onClick={() => navigate('/dashboard')}>
+        Return to Dashboard
+      </button>
       <div className="pricing__header">
-        <h1 className="pricing__title">Plans & Pricing</h1>
-        <p className="pricing__subtitle">Choose the right plan for your business</p>
+        <h1 className="pricing__title">Subscription Services</h1>
+        <p className="pricing__subtitle">Select the service agreement aligned with your organizational requirements.</p>
       </div>
 
       {toast && (
@@ -129,7 +132,7 @@ const Pricing = () => {
         {/* Free Plan */}
         <div className={`pricing__card ${isPro ? 'pricing__card--muted' : 'pricing__card--active'}`}>
           <div className="pricing__card-header">
-            <h2 className="pricing__plan-name">Free</h2>
+            <h2 className="pricing__plan-name">Standard</h2>
             <div className="pricing__price">
               <span className="pricing__amount">₹0</span>
               <span className="pricing__period">/month</span>
@@ -147,17 +150,17 @@ const Pricing = () => {
             className={`pricing__btn ${isPro ? 'pricing__btn--secondary' : 'pricing__btn--primary'}`}
             disabled={true}
           >
-            {isPro ? 'Downgrade' : 'Current Plan'}
+            {isPro ? 'Standard Tier' : 'Active Agreement'}
           </button>
         </div>
 
-        {/* Pro Plan */}
+        {/* Pro Plan (Monthly) */}
         <div className={`pricing__card ${isPro ? 'pricing__card--active' : 'pricing__card--highlight'}`}>
           {!isPro && (
-            <div className="pricing__popular-badge">POPULAR</div>
+            <div className="pricing__popular-badge">RECOMMENDED</div>
           )}
           <div className="pricing__card-header">
-            <h2 className="pricing__plan-name">Pro</h2>
+            <h2 className="pricing__plan-name">Premium (Monthly)</h2>
             <div className="pricing__price">
               <span className="pricing__amount pricing__amount--pro">₹999</span>
               <span className="pricing__period">/month</span>
@@ -175,23 +178,55 @@ const Pricing = () => {
           </ul>
           <button 
             className={`pricing__btn ${isPro ? 'pricing__btn--secondary' : 'pricing__btn--primary'}`}
-            onClick={handleUpgrade}
+            onClick={() => handleUpgrade('pro')}
             disabled={isPro || isLoading}
           >
-            {isPro ? 'Current Plan' : isLoading ? 'Processing...' : 'Upgrade to Pro'}
+            {isPro ? 'Active Agreement' : isLoading ? 'Processing Transaction...' : 'Establish Premium Agreement'}
+          </button>
+        </div>
+
+        {/* Pro Plan (Annual) */}
+        <div className={`pricing__card ${isPro ? 'pricing__card--active' : 'pricing__card--highlight'}`}>
+          {!isPro && (
+            <div className="pricing__popular-badge">BEST VALUE</div>
+          )}
+          <div className="pricing__card-header">
+            <h2 className="pricing__plan-name">Premium (Annual)</h2>
+            <div className="pricing__price">
+              <span className="pricing__amount pricing__amount--pro">₹6,999</span>
+              <span className="pricing__period">/year</span>
+            </div>
+          </div>
+          <ul className="pricing__features">
+            {features.map((feature, index) => (
+              <li key={index} className="pricing__feature">
+                <span className="pricing__feature-name">{feature.name}</span>
+                <span className="pricing__feature-value pricing__feature-value--pro">
+                  {feature.pro}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <button 
+            className={`pricing__btn ${isPro ? 'pricing__btn--secondary' : 'pricing__btn--primary'}`}
+            onClick={() => handleUpgrade('pro_annual')}
+            disabled={isPro || isLoading}
+          >
+            {isPro ? 'Active Agreement' : isLoading ? 'Processing Transaction...' : 'Establish Annual Agreement'}
           </button>
         </div>
       </div>
 
       {/* Comparison Table */}
       <div className="pricing__comparison">
-        <h3 className="pricing__comparison-title">Feature Comparison</h3>
+        <h3 className="pricing__comparison-title">Operational Feature Comparison</h3>
         <table className="pricing__table">
           <thead>
             <tr>
-              <th>Feature</th>
-              <th>Free</th>
-              <th>Pro</th>
+              <th>Service Element</th>
+              <th>Standard</th>
+              <th>Premium (Monthly)</th>
+              <th>Premium (Annual)</th>
             </tr>
           </thead>
           <tbody>
@@ -199,6 +234,7 @@ const Pricing = () => {
               <tr key={index}>
                 <td>{feature.name}</td>
                 <td className="pricing__table-free">{feature.free}</td>
+                <td className="pricing__table-pro">{feature.pro}</td>
                 <td className="pricing__table-pro">{feature.pro}</td>
               </tr>
             ))}

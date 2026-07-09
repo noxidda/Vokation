@@ -48,15 +48,15 @@ const RevenueChart = ({ data, isLoading }) => {
       {
         label: 'Revenue',
         data: data.map(d => d.revenue),
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderColor: '#E2D9F3',
+        backgroundColor: '#000000',
         borderWidth: 2,
         pointRadius: 4,
         pointHoverRadius: 6,
-        pointBackgroundColor: '#ec4899',
-        pointBorderColor: '#ffffff',
-        tension: 0.2,
-        fill: true,
+        pointBackgroundColor: '#9B7EB2',
+        pointBorderColor: '#000000',
+        tension: 0,
+        fill: false,
       },
     ],
   };
@@ -70,20 +70,20 @@ const RevenueChart = ({ data, isLoading }) => {
         display: false,
       },
       tooltip: {
-        backgroundColor: '#0d0917',
-        titleColor: '#ffffff',
-        bodyColor: '#e2d9f3',
-        borderColor: 'rgba(139, 92, 246, 0.3)',
+        backgroundColor: '#000000',
+        titleColor: '#E2D9F3',
+        bodyColor: '#E2D9F3',
+        borderColor: '#E2D9F3',
         borderWidth: 1,
-        cornerRadius: 6,
+        cornerRadius: 0,
         padding: 12,
         titleFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '600',
           size: 12,
         },
         bodyFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '400',
           size: 12,
         },
@@ -101,7 +101,7 @@ const RevenueChart = ({ data, isLoading }) => {
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 11,
           },
@@ -110,18 +110,16 @@ const RevenueChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
       },
       y: {
         grid: {
-          display: true,
-          color: 'rgba(139, 92, 246, 0.08)',
-          drawBorder: false,
+          display: false,
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 11,
           },
@@ -132,7 +130,7 @@ const RevenueChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
       },
     },

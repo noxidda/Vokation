@@ -8,18 +8,28 @@ import {
   retryFailedJob,
   initiateShopifyConnect,
   shopifyCallback,
+  initiateGoogleConnect,
+  googleCallback,
+  initiateMailchimpConnect,
+  mailchimpCallback,
 } from '../controllers/integrationController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { organizationAccess } from '../middleware/organizationAccess.js';
 
 const router = express.Router();
 
-// Shopify OAuth - public routes (callbacks)
+// Public OAuth Callback endpoints
 router.get('/shopify/connect', initiateShopifyConnect);
 router.get('/shopify/callback', shopifyCallback);
+router.get('/google-analytics/callback', googleCallback);
+router.get('/mailchimp/callback', mailchimpCallback);
 
 // Protected routes
 router.use(authMiddleware, organizationAccess);
+
+// Connect OAuth initiation endpoints (protected GET routes authenticated via query token)
+router.get('/google_analytics/connect', initiateGoogleConnect);
+router.get('/mailchimp/connect', initiateMailchimpConnect);
 
 router.get('/', getIntegrations);
 router.post('/:platform/connect', connectIntegration);

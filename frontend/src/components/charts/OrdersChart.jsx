@@ -46,10 +46,10 @@ const OrdersChart = ({ data, isLoading }) => {
       {
         label: 'Orders',
         data: data.map(d => d.orders),
-        backgroundColor: 'rgba(236, 72, 153, 0.7)',
-        borderColor: '#ec4899',
+        backgroundColor: '#9B7EB2',
+        borderColor: '#9B7EB2',
         borderWidth: 1,
-        borderRadius: 4,
+        borderRadius: 0,
       },
     ],
   };
@@ -63,20 +63,20 @@ const OrdersChart = ({ data, isLoading }) => {
         display: false,
       },
       tooltip: {
-        backgroundColor: '#0d0917',
-        titleColor: '#ffffff',
-        bodyColor: '#e2d9f3',
-        borderColor: 'rgba(139, 92, 246, 0.3)',
+        backgroundColor: '#000000',
+        titleColor: '#E2D9F3',
+        bodyColor: '#E2D9F3',
+        borderColor: '#E2D9F3',
         borderWidth: 1,
-        cornerRadius: 6,
+        cornerRadius: 0,
         padding: 12,
         titleFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '600',
           size: 12,
         },
         bodyFont: {
-          family: 'Raleway',
+          family: 'DM Sans',
           weight: '400',
           size: 12,
         },
@@ -89,7 +89,7 @@ const OrdersChart = ({ data, isLoading }) => {
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 10,
           },
@@ -98,18 +98,16 @@ const OrdersChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
       },
       y: {
         grid: {
-          display: true,
-          color: 'rgba(139, 92, 246, 0.08)',
-          drawBorder: false,
+          display: false,
         },
         ticks: {
           font: {
-            family: 'Raleway',
+            family: 'DM Sans',
             weight: '400',
             size: 10,
           },
@@ -118,7 +116,7 @@ const OrdersChart = ({ data, isLoading }) => {
         },
         border: {
           display: true,
-          color: 'rgba(139, 92, 246, 0.15)',
+          color: '#E2D9F3',
         },
         beginAtZero: true,
       },

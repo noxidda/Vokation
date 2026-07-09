@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGetDashboardMetricsQuery } from '../features/dashboard/dashboardSlice';
 import { useSyncIntegrationMutation } from '../features/integrations/integrationsSlice';
 import Card from '../components/ui/Card';
@@ -9,6 +10,7 @@ import ConversionChart from '../components/charts/ConversionChart';
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { data, isLoading, error, refetch } = useGetDashboardMetricsQuery();
   const [syncIntegration, { isLoading: isSyncing }] = useSyncIntegrationMutation();
   const [syncStatus, setSyncStatus] = useState('idle');
@@ -27,10 +29,8 @@ const Dashboard = () => {
     try {
       setSyncStatus('queued');
       await syncIntegration({ platform: 'shopify' }).unwrap();
-      // The sync will happen in the background
-      // Socket events will update the UI
     } catch (error) {
-      console.error('Sync failed:', error);
+      console.error('Synchronization failed:', error);
       setSyncStatus('failed');
     }
   };
@@ -38,19 +38,19 @@ const Dashboard = () => {
   const metrics = [
     { 
       key: 'totalRevenue', 
-      label: 'Total Revenue', 
+      label: 'Gross Revenue', 
       value: data?.totalRevenue || 0,
       format: formatCurrency,
     },
     { 
       key: 'totalOrders', 
-      label: 'Total Orders', 
+      label: 'Total Transactions', 
       value: data?.totalOrders || 0,
       format: formatNumber,
     },
     { 
       key: 'totalVisitors', 
-      label: 'Visitors', 
+      label: 'Session Visitors', 
       value: data?.totalVisitors || 0,
       format: formatNumber,
     },
@@ -65,11 +65,11 @@ const Dashboard = () => {
   if (error) {
     return (
       <div className="dashboard">
-        <h1 className="dashboard__title">Dashboard</h1>
+        <h1 className="dashboard__title">System Dashboard</h1>
         <div className="dashboard__error">
-          <p>Failed to load dashboard metrics</p>
+          <p>Failed to retrieve operational metrics.</p>
           <button className="dashboard__retry" onClick={refetch}>
-            Retry
+            Retry Request
           </button>
         </div>
       </div>
@@ -79,14 +79,14 @@ const Dashboard = () => {
   if (!data?.hasIntegrations) {
     return (
       <div className="dashboard">
-        <h1 className="dashboard__title">Dashboard</h1>
+        <h1 className="dashboard__title">System Dashboard</h1>
         <div className="dashboard__empty-state">
           <EmptyState
-            title="No platforms connected"
-            description="Connect Shopify or Google Analytics to see your metrics here"
+            title="No Integrations Active"
+            description="Establish a platform connection to retrieve operational metrics."
             action={true}
-            actionLabel="Go to Integrations"
-            onAction={() => window.location.href = '/integrations'}
+            actionLabel="Configure Integrations"
+            onAction={() => navigate('/integrations')}
           />
         </div>
       </div>
@@ -96,12 +96,12 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard__header">
-        <h1 className="dashboard__title">Dashboard</h1>
+        <h1 className="dashboard__title">System Dashboard</h1>
         <div className="dashboard__controls">
           {data?.lastSynced && (
             <span className="dashboard__last-synced">
-              Last updated: {new Date(data.lastSynced).toLocaleString()}
-              {data.hasPendingJobs && ' (Sync in progress...)'}
+              Last Synchronization: {new Date(data.lastSynced).toLocaleString()}
+              {data.hasPendingJobs && ' (Synchronizing...)'}
             </span>
           )}
           <button 
@@ -109,7 +109,7 @@ const Dashboard = () => {
             onClick={handleSync}
             disabled={isSyncing || data?.hasPendingJobs}
           >
-            {data?.hasPendingJobs ? 'Syncing...' : 'Sync Now'}
+            {data?.hasPendingJobs ? 'Synchronizing...' : 'Request Sync'}
           </button>
         </div>
       </div>
@@ -128,7 +128,7 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard__section">
-        <h2 className="dashboard__subtitle">Revenue Trend (30 Days)</h2>
+        <h2 className="dashboard__subtitle">Revenue Performance (30 Days)</h2>
         <Card>
           <RevenueChart 
             data={data?.revenueTrend || []} 
@@ -139,7 +139,7 @@ const Dashboard = () => {
 
       <div className="dashboard__charts-grid">
         <div className="dashboard__section">
-          <h2 className="dashboard__subtitle">Daily Orders</h2>
+          <h2 className="dashboard__subtitle">Daily Transaction Volumes</h2>
           <Card>
             <OrdersChart 
               data={data?.ordersTrend || []} 
@@ -148,7 +148,7 @@ const Dashboard = () => {
           </Card>
         </div>
         <div className="dashboard__section">
-          <h2 className="dashboard__subtitle">Conversion Rate</h2>
+          <h2 className="dashboard__subtitle">Session Conversion Rate</h2>
           <Card>
             <ConversionChart 
               data={data?.conversionTrend || []} 

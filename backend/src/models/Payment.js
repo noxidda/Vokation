@@ -38,7 +38,7 @@ const paymentSchema = new mongoose.Schema({
   },
   plan: {
     type: String,
-    enum: ['pro'],
+    enum: ['pro', 'pro_annual'],
     required: true,
   },
   status: {

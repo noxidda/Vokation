@@ -2,36 +2,33 @@
   display: inline-block;
   padding: 4px 10px;
   font-family: var(--font-family);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border: 1px solid;
-  border-radius: var(--border-radius);
 }
 
 .badge--success {
-  color: var(--color-white);
-  border-color: var(--color-purple);
-  background: rgba(139, 92, 246, 0.15);
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.1);
+  color: var(--color-lavender);
+  border-color: var(--color-border);
+  background: var(--color-black);
 }
 
 .badge--warning {
-  color: var(--color-lavender);
+  color: var(--color-lavender-dark);
   border-color: var(--color-border);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--color-black);
 }
 
 .badge--error {
   color: var(--color-pink);
   border-color: var(--color-pink);
-  background: rgba(236, 72, 153, 0.1);
-  box-shadow: 0 0 8px rgba(236, 72, 153, 0.15);
+  background: var(--color-black);
 }
 
 .badge--info {
   color: var(--color-lavender-dark);
   border-color: var(--color-border);
-  background: rgba(13, 9, 23, 0.4);
+  background: var(--color-black);
 }

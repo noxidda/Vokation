@@ -15,7 +15,7 @@ const backgroundJobSchema = new mongoose.Schema({
   },
   platform: {
     type: String,
-    enum: ['shopify', 'google_analytics', 'facebook_ads', 'mailchimp'],
+    enum: ['shopify', 'google_analytics', 'mailchimp'],
     required: true,
   },
   status: {
