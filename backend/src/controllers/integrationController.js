@@ -1,5 +1,6 @@
 import Integration from '../models/Integration.js';
 import AuditLog from '../models/AuditLog.js';
+import User from '../models/User.js';
 import { encrypt } from '../services/encryptionService.js';
 import { queueSyncJob, getRecentJobs, retryJob } from '../services/bullQueue.js';
 import crypto from 'crypto';
@@ -362,6 +363,7 @@ export const initiateGoogleConnect = async (req, res) => {
     
     oauthStates.set(state, {
       organizationId,
+      userId: req.userId,
       timestamp: Date.now(),
     });
 
@@ -429,12 +431,20 @@ export const googleCallback = async (req, res) => {
     );
 
     // Create audit log
-    await AuditLog.create({
-      organizationId: stateData.organizationId,
-      userId: req.userId || 'system',
-      action: 'connected_integration',
-      metadata: { platform: 'google_analytics' },
-    });
+    try {
+      const u = await User.findOne({ organizationId: stateData.organizationId });
+      const uid = stateData.userId || u?._id;
+      if (uid) {
+        await AuditLog.create({
+          organizationId: stateData.organizationId,
+          userId: uid,
+          action: 'connected_integration',
+          metadata: { platform: 'google_analytics' },
+        });
+      }
+    } catch (auditError) {
+      console.error('Google Analytics audit log error:', auditError);
+    }
 
     res.redirect(`${frontendUrl}/integrations?success=google_analytics`);
   } catch (error) {
@@ -451,6 +461,7 @@ export const initiateMailchimpConnect = async (req, res) => {
     
     oauthStates.set(state, {
       organizationId,
+      userId: req.userId,
       timestamp: Date.now(),
     });
 
@@ -528,12 +539,20 @@ export const mailchimpCallback = async (req, res) => {
     );
 
     // Create audit log
-    await AuditLog.create({
-      organizationId: stateData.organizationId,
-      userId: req.userId || 'system',
-      action: 'connected_integration',
-      metadata: { platform: 'mailchimp', account: accountName },
-    });
+    try {
+      const u = await User.findOne({ organizationId: stateData.organizationId });
+      const uid = stateData.userId || u?._id;
+      if (uid) {
+        await AuditLog.create({
+          organizationId: stateData.organizationId,
+          userId: uid,
+          action: 'connected_integration',
+          metadata: { platform: 'mailchimp', account: accountName },
+        });
+      }
+    } catch (auditError) {
+      console.error('Mailchimp audit log error:', auditError);
+    }
 
     res.redirect(`${frontendUrl}/integrations?success=mailchimp`);
   } catch (error) {
