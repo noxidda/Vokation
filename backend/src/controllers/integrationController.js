@@ -21,6 +21,17 @@ export const initiateShopifyConnect = async (req, res) => {
       });
     }
 
+    // Support local mock/test shop connection
+    if (shop === 'mock' || shop === 'test' || shop.includes('mock') || shop.includes('test')) {
+      const state = crypto.randomBytes(16).toString('hex');
+      oauthStates.set(state, {
+        organizationId,
+        timestamp: Date.now(),
+      });
+      res.redirect(`/api/integrations/shopify/callback?code=mock_code&shop=${shop}&state=${state}`);
+      return;
+    }
+
     // Generate state for CSRF protection
     const state = crypto.randomBytes(16).toString('hex');
     
@@ -61,6 +72,28 @@ export const shopifyCallback = async (req, res) => {
 
     // Remove used state
     oauthStates.delete(state);
+
+    // Bypass verification and token exchange if it is a mock connection
+    if (code === 'mock_code') {
+      const encryptedToken = encrypt('mock_shopify_token');
+      const integration = await Integration.create({
+        organizationId: stateData.organizationId,
+        platform: 'shopify',
+        accessToken: encryptedToken,
+        platformStoreId: shop,
+        isActive: true,
+      });
+
+      await AuditLog.create({
+        organizationId: stateData.organizationId,
+        userId: req.userId || 'system',
+        action: 'connected_integration',
+        metadata: { platform: 'shopify', storeId: shop },
+      });
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      return res.redirect(`${frontendUrl}/integrations?success=shopify`);
+    }
 
     // Verify HMAC
     const queryString = Object.keys(req.query)
