@@ -87,12 +87,20 @@ export const shopifyCallback = async (req, res) => {
         { upsert: true, new: true }
       );
 
-      await AuditLog.create({
-        organizationId: stateData.organizationId,
-        userId: req.userId || 'system',
-        action: 'connected_integration',
-        metadata: { platform: 'shopify', storeId: shop },
-      });
+      try {
+        const u = await User.findOne({ organizationId: stateData.organizationId });
+        const uid = stateData.userId || u?._id;
+        if (uid) {
+          await AuditLog.create({
+            organizationId: stateData.organizationId,
+            userId: uid,
+            action: 'connected_integration',
+            metadata: { platform: 'shopify', storeId: shop },
+          });
+        }
+      } catch (auditError) {
+        console.error('Shopify mock audit log error:', auditError);
+      }
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       return res.redirect(`${frontendUrl}/integrations?success=shopify`);
@@ -155,12 +163,20 @@ export const shopifyCallback = async (req, res) => {
     );
 
     // Create audit log
-    await AuditLog.create({
-      organizationId: stateData.organizationId,
-      userId: req.userId || 'system',
-      action: 'connected_integration',
-      metadata: { platform: 'shopify', storeId: shop },
-    });
+    try {
+      const u = await User.findOne({ organizationId: stateData.organizationId });
+      const uid = stateData.userId || u?._id;
+      if (uid) {
+        await AuditLog.create({
+          organizationId: stateData.organizationId,
+          userId: uid,
+          action: 'connected_integration',
+          metadata: { platform: 'shopify', storeId: shop },
+        });
+      }
+    } catch (auditError) {
+      console.error('Shopify audit log error:', auditError);
+    }
 
     // Redirect back to frontend
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
