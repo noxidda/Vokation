@@ -168,7 +168,7 @@ export const shopifyCallback = async (req, res) => {
   } catch (error) {
     console.error('Shopify callback error:', error);
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    res.redirect(`${frontendUrl}/integrations?error=shopify`);
+    res.redirect(`${frontendUrl}/integrations?error=shopify&msg=${encodeURIComponent(error.message || 'Unknown backend error')}`);
   }
 };
 
@@ -449,7 +449,7 @@ export const googleCallback = async (req, res) => {
     res.redirect(`${frontendUrl}/integrations?success=google_analytics`);
   } catch (error) {
     console.error('Google Analytics callback error:', error);
-    res.redirect(`${frontendUrl}/integrations?error=google_analytics`);
+    res.redirect(`${frontendUrl}/integrations?error=google_analytics&msg=${encodeURIComponent(error.message || 'Unknown backend error')}`);
   }
 };
 
@@ -557,6 +557,6 @@ export const mailchimpCallback = async (req, res) => {
     res.redirect(`${frontendUrl}/integrations?success=mailchimp`);
   } catch (error) {
     console.error('Mailchimp callback error:', error);
-    res.redirect(`${frontendUrl}/integrations?error=mailchimp`);
+    res.redirect(`${frontendUrl}/integrations?error=mailchimp&msg=${encodeURIComponent(error.message || 'Unknown backend error')}`);
   }
 };

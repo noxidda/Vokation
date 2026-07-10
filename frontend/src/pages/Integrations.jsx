@@ -30,10 +30,11 @@ const Integrations = () => {
       setSearchParams({}, { replace: true });
       refetch();
     } else if (errorParam) {
+      const msg = searchParams.get('msg');
       setToast({
         type: 'error',
         title: 'Integration Failure',
-        message: `Failed to establish ${errorParam} platform connection. Please verify credentials.`,
+        message: msg || `Failed to establish ${errorParam} platform connection. Please verify credentials.`,
       });
       setSearchParams({}, { replace: true });
     }
