@@ -8,7 +8,7 @@ import Modal from '../components/ui/Modal';
 import './Integrations.css';
 
 const Integrations = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [toast, setToast] = useState(null);
   const { data: integrations, isLoading, error, refetch } = useGetIntegrationsQuery();
   const [disconnectIntegration] = useDisconnectIntegrationMutation();
@@ -21,21 +21,23 @@ const Integrations = () => {
     const success = searchParams.get('success');
     const errorParam = searchParams.get('error');
 
-    if (success === 'shopify') {
+    if (success) {
       setToast({
         type: 'success',
         title: 'Integration Established',
-        message: 'The Shopify platform connection has been successfully established.',
+        message: `The ${success} platform connection has been successfully established.`,
       });
+      setSearchParams({}, { replace: true });
       refetch();
-    } else if (errorParam === 'shopify') {
+    } else if (errorParam) {
       setToast({
         type: 'error',
         title: 'Integration Failure',
-        message: 'Failed to establish Shopify platform connection. Please verify credentials.',
+        message: `Failed to establish ${errorParam} platform connection. Please verify credentials.`,
       });
+      setSearchParams({}, { replace: true });
     }
-  }, [searchParams, refetch]);
+  }, [searchParams, setSearchParams, refetch]);
 
   const platforms = [
     { id: 'shopify', name: 'Shopify Storefront', available: true },
