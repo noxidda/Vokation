@@ -1,9 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { apiClient } from '../../services/apiClient';
+import { customBaseQuery } from '../../services/apiClient';
 
 export const teamApi = createApi({
   reducerPath: 'teamApi',
-  baseQuery: apiClient,
+  baseQuery: customBaseQuery,
   tagTypes: ['Team'],
   endpoints: (builder) => ({
     getTeamMembers: builder.query({

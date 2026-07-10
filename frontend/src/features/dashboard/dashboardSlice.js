@@ -1,9 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
-import { apiClient } from '../../services/apiClient';
+import { customBaseQuery } from '../../services/apiClient';
 
 export const dashboardApi = createApi({
   reducerPath: 'dashboardApi',
-  baseQuery: apiClient,
+  baseQuery: customBaseQuery,
   tagTypes: ['Dashboard'],
   endpoints: (builder) => ({
     getDashboardMetrics: builder.query({
