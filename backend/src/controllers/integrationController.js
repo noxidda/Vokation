@@ -76,13 +76,15 @@ export const shopifyCallback = async (req, res) => {
     // Bypass verification and token exchange if it is a mock connection
     if (code === 'mock_code') {
       const encryptedToken = encrypt('mock_shopify_token');
-      const integration = await Integration.create({
-        organizationId: stateData.organizationId,
-        platform: 'shopify',
-        accessToken: encryptedToken,
-        platformStoreId: shop,
-        isActive: true,
-      });
+      await Integration.findOneAndUpdate(
+        { organizationId: stateData.organizationId, platform: 'shopify' },
+        {
+          accessToken: encryptedToken,
+          platformStoreId: shop,
+          isActive: true,
+        },
+        { upsert: true, new: true }
+      );
 
       await AuditLog.create({
         organizationId: stateData.organizationId,
@@ -140,14 +142,16 @@ export const shopifyCallback = async (req, res) => {
     const encryptedToken = encrypt(tokenData.access_token);
 
     // Save integration
-    const integration = await Integration.create({
-      organizationId: stateData.organizationId,
-      platform: 'shopify',
-      accessToken: encryptedToken,
-      refreshToken: tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null,
-      platformStoreId: shop,
-      isActive: true,
-    });
+    await Integration.findOneAndUpdate(
+      { organizationId: stateData.organizationId, platform: 'shopify' },
+      {
+        accessToken: encryptedToken,
+        refreshToken: tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null,
+        platformStoreId: shop,
+        isActive: true,
+      },
+      { upsert: true, new: true }
+    );
 
     // Create audit log
     await AuditLog.create({
@@ -413,14 +417,16 @@ export const googleCallback = async (req, res) => {
     const encryptedRefreshToken = tokenData.refresh_token ? encrypt(tokenData.refresh_token) : null;
 
     // Save integration
-    await Integration.create({
-      organizationId: stateData.organizationId,
-      platform: 'google_analytics',
-      accessToken: encryptedToken,
-      refreshToken: encryptedRefreshToken,
-      platformStoreId: 'Google Analytics Property',
-      isActive: true,
-    });
+    await Integration.findOneAndUpdate(
+      { organizationId: stateData.organizationId, platform: 'google_analytics' },
+      {
+        accessToken: encryptedToken,
+        refreshToken: encryptedRefreshToken,
+        platformStoreId: 'Google Analytics Property',
+        isActive: true,
+      },
+      { upsert: true, new: true }
+    );
 
     // Create audit log
     await AuditLog.create({
@@ -511,13 +517,15 @@ export const mailchimpCallback = async (req, res) => {
     const encryptedToken = encrypt(accessToken);
 
     // Save integration
-    await Integration.create({
-      organizationId: stateData.organizationId,
-      platform: 'mailchimp',
-      accessToken: encryptedToken,
-      platformStoreId: accountName,
-      isActive: true,
-    });
+    await Integration.findOneAndUpdate(
+      { organizationId: stateData.organizationId, platform: 'mailchimp' },
+      {
+        accessToken: encryptedToken,
+        platformStoreId: accountName,
+        isActive: true,
+      },
+      { upsert: true, new: true }
+    );
 
     // Create audit log
     await AuditLog.create({
